@@ -170,44 +170,125 @@ local function getPing()
     return pingStat and pingStat:GetValue() or 0
 end
 
-FastRebTab:AddLabel("🔄 Auto Rebirth Farm").TextSize = 21
-
-local function rebirthLoop()
-    while isRunning do
-        local currentReb = rebirthsStat.Value
-        local strengthTarget = 5000 + (currentReb * 2550)
-        
-        managePets("Swift Samurai")
-        
-        while isRunning and player.leaderstats.Strength.Value < strengthTarget do
-            if getPing() < 350 then
-                local reps = player.MembershipType == Enum.MembershipType.Premium and 8 or 14
-                for i = 1, reps do 
-                    muscleEvent:FireServer("rep")
-                end
-                task.wait(0.01)
-            else
-                task.wait(1)
+local function unequipAllPets()
+    if player:FindFirstChild("petsFolder") then
+        for _, folder in pairs(player.petsFolder:GetChildren()) do
+            for _, pet in pairs(folder:GetChildren()) do
+                rEvents.equipPetEvent:FireServer("unequipPet", pet)
             end
         end
-
-        if not isRunning then break end
-        
-        managePets("Tribal Overlord")
-        task.wait(0.25)
-        
-        local before = rebirthsStat.Value
-        repeat
-            ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait(0.5)
-        until rebirthsStat.Value > before or not isRunning
     end
 end
 
-FastRebTab:AddSwitch("🔄 Auto Rebirth", function(state)
-    isRunning = state
-    if state then
-        task.spawn(rebirthLoop)
+local function equipUniquePet(name)
+    if player:FindFirstChild("petsFolder") and player.petsFolder:FindFirstChild("Unique") then
+        for _, pet in pairs(player.petsFolder.Unique:GetChildren()) do
+            if pet.Name == name then
+                rEvents.equipPetEvent:FireServer("equipPet", pet)
+                task.wait(0.01) 
+            end
+        end
+    end
+end
+
+local function findMachine(machineName)
+    local machine = workspace:FindFirstChild("machinesFolder") and workspace.machinesFolder:FindFirstChild(machineName)
+    if not machine then
+        for _, f in pairs(workspace:GetChildren()) do
+            if f:IsA("Folder") and f.Name:find("machines") then
+                machine = f:FindFirstChild(machineName)
+                if machine then break end
+            end
+        end
+    end
+    return machine
+end
+
+local function pressE()
+    local vim = game:GetService("VirtualInputManager")
+    vim:SendKeyEvent(true, "E", false, game)
+    task.wait(0.05)
+    vim:SendKeyEvent(false, "E", false, game)
+end
+
+FastRebirthTab:AddLabel("🔄 Auto Rebirth Farm").TextSize = 21
+
+FastRebirthTab:AddSwitch("🔄 Auto Rebirth Farm", function(bool)
+    isRunning = bool
+    if not bool then return end
+    task.spawn(function()
+        while isRunning do
+            local currentReb = rebirthsStat.Value
+            local rebirthCost = 10000 + (5000 * currentReb)
+            if player:FindFirstChild("ultimatesFolder") and player.ultimatesFolder:FindFirstChild("Golden Rebirth") then
+                local gReb = player.ultimatesFolder["Golden Rebirth"].Value
+                rebirthCost = math.floor(rebirthCost * (1 - (gReb * 0.1)))
+            end
+            unequipAllPets()
+            task.wait(0.1)
+            equipUniquePet("Swift Samurai")
+            while isRunning and leaderstats.Strength.Value < rebirthCost do
+                if getPing() < 350 then
+                    for i = 1, 12 do muscleEvent:FireServer("rep") end
+                    task.wait(0.01)
+                else
+                    task.wait(1)
+                end
+            end
+            if not isRunning then break end
+            unequipAllPets()
+            task.wait(0.1)
+            equipUniquePet("Tribal Overlord")
+            local machine = findMachine("Jungle Bar Lift")
+            if machine and machine:FindFirstChild("interactSeat") then
+                player.Character.HumanoidRootPart.CFrame = machine.interactSeat.CFrame * CFrame.new(0, 3, 0)
+                local retryCount = 0
+                repeat
+                    task.wait(0.2)
+                    pressE()
+                    retryCount = retryCount + 1
+                until (player.Character and player.Character.Humanoid.Sit) or retryCount > 20 or not isRunning
+            end
+            local initialReb = rebirthsStat.Value
+            repeat
+                rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                task.wait(0.5)
+            until rebirthsStat.Value > initialReb or not isRunning
+        end
+    end)
+end)
+
+FastRebirthTab:AddButton("🏋️‍♂️ Jungle Lift", function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = CFrame.new(-8666, 34, 2070)
+        task.wait(0.5)
+        local machine = findMachine("Jungle Bar Lift")
+        if machine and machine:FindFirstChild("interactSeat") then
+            local retryCount = 0
+            repeat
+                task.wait(0.2)
+                pressE()
+                retryCount = retryCount + 1
+            until (player.Character and player.Character.Humanoid.Sit) or retryCount > 10
+        end
+    end
+end)
+
+FastRebirthTab:AddButton("🦵 Jungle Squat", function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = CFrame.new(-8377.55, 48.71, 2864.90)
+        task.wait(0.5)
+        local machine = findMachine("Jungle Squat Rack") or findMachine("Squat Rack")
+        if machine and machine:FindFirstChild("interactSeat") then
+            local retryCount = 0
+            repeat
+                task.wait(0.2)
+                pressE()
+                retryCount = retryCount + 1
+            until (player.Character and player.Character.Humanoid.Sit) or retryCount > 10
+        end
     end
 end)
 
@@ -362,7 +443,7 @@ task.spawn(function()
     end
 end)
 
-local runStrengthFarm = false
+local strengthOnly = false
 local repsPerTick = 23
 
 local function getPing()
@@ -371,36 +452,106 @@ local function getPing()
     return pingStat and pingStat:GetValue() or 0
 end
 
-FarmingTab:AddLabel("💪 Fast Strength").TextSize = 21
-
-FarmingTab:AddTextBox("Rep Speed", function(value)
-    local num = tonumber(value)
-    if num and num > 0 then
-        repsPerTick = math.floor(num)
-    end
-end, {
-    placeholder = "Hız girin (Örn: 26)",
-})
-
-local function strengthLoop()
-    unequipAllPets()
-    task.wait(0.1)
-    equipUniquePet("Swift Samurai")
-    while runStrengthFarm do
-        if getPing() < 350 then
-            for i = 1, repsPerTick do 
-                muscleEvent:FireServer("rep")
+local function unequipAllPets()
+    if player:FindFirstChild("petsFolder") then
+        for _, folder in pairs(player.petsFolder:GetChildren()) do
+            for _, pet in pairs(folder:GetChildren()) do
+                rEvents.equipPetEvent:FireServer("unequipPet", pet)
             end
-            task.wait(0.01)
-        else
-            task.wait(1)
         end
     end
 end
 
-FarmingTab:AddSwitch("💢 Auto Strength Farm", function(state)
-    runStrengthFarm = state
-    if state then
-        task.spawn(strengthLoop)
+-- BURASI GÜNCELLENDİ: Bulduğu isme sahip tüm petleri takar
+local function equipUniquePet(name)
+    if player:FindFirstChild("petsFolder") and player.petsFolder:FindFirstChild("Unique") then
+        for _, pet in pairs(player.petsFolder.Unique:GetChildren()) do
+            if pet.Name == name then
+                rEvents.equipPetEvent:FireServer("equipPet", pet)
+                -- Hepsini takabilmesi için çok kısa bir bekleme (Remote limitine takılmamak için)
+                task.wait(0.01) 
+            end
+        end
+    end
+end
+
+local function findMachine(machineName)
+    local machine = workspace:FindFirstChild("machinesFolder") and workspace.machinesFolder:FindFirstChild(machineName)
+    if not machine then
+        for _, f in pairs(workspace:GetChildren()) do
+            if f:IsA("Folder") and f.Name:find("machines") then
+                machine = f:FindFirstChild(machineName)
+                if machine then break end
+            end
+        end
+    end
+    return machine
+end
+
+local function pressE()
+    local vim = game:GetService("VirtualInputManager")
+    vim:SendKeyEvent(true, "E", false, game)
+    task.wait(0.05)
+    vim:SendKeyEvent(false, "E", false, game)
+end
+
+FarmingTab:AddLabel("💪 Fast Strength").TextSize = 21
+
+FarmingTab:AddTextBox("Rep Speed", function(value)
+    local num = tonumber(value)
+    if num and num > 0 then repsPerTick = math.floor(num) end
+end, {placeholder = "Hız (Örn: 26)"})
+
+FarmingTab:AddSwitch("💢 Auto Strength Farm", function(bool)
+    strengthOnly = bool
+    if not bool then return end
+    task.spawn(function()
+        unequipAllPets()
+        task.wait(0.2)
+        equipUniquePet("Swift Samurai") -- Kaç tane varsa hepsini takar
+        while strengthOnly do
+            if getPing() < 350 then
+                for i = 1, repsPerTick do muscleEvent:FireServer("rep") end
+                task.wait(0.01)
+            else
+                task.wait(1)
+            end
+        end
+    end)
+end)
+
+FarmingTab:AddLabel("Machine Teleports").TextSize = 21
+
+FarmingTab:AddButton("🏋️‍♂️ Jungle Lift", function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = CFrame.new(-8666, 34, 2070)
+        task.wait(0.5)
+        local machine = findMachine("Jungle Bar Lift")
+        if machine and machine:FindFirstChild("interactSeat") then
+            local retryCount = 0
+            repeat
+                task.wait(0.2)
+                pressE()
+                retryCount = retryCount + 1
+            until (player.Character and player.Character.Humanoid.Sit) or retryCount > 10
+        end
+    end
+end)
+
+FarmingTab:AddButton("🦵 Jungle Squat", function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = CFrame.new(-8377.55, 48.71, 2864.90)
+        task.wait(0.5)
+        local machine = findMachine("Jungle Squat Rack") or findMachine("Squat Rack")
+        if machine and machine:FindFirstChild("interactSeat") then
+            local retryCount = 0
+            repeat
+                task.wait(0.2)
+                pressE()
+                retryCount = retryCount + 1
+            until (player.Character and player.Character.Humanoid.Sit) or retryCount > 10
+        end
     end
 end)

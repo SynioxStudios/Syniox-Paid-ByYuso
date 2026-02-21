@@ -38,7 +38,7 @@ local window = library:AddWindow("Syniox Paid | Muscle Legends || HELLO - ".. di
 local FastRebTab = window:AddTab("Fast Rebirth")
 
 local function formatNumber(num)
-    if num >= 1e15 then return string.format("%.2fQA", num/1e15) end
+    if num >= 1e15 then return string.format("%.2fQ", num/1e15) end
     if num >= 1e12 then return string.format("%.2fT", num/1e12) end
     if num >= 1e9 then return string.format("%.2fB", num/1e9) end
     if num >= 1e6 then return string.format("%.2fM", num/1e6) end
@@ -61,14 +61,12 @@ local averagePaceLabel = FastRebTab:AddLabel("Average Pace: 0 / Hour | 0 / Day |
 paceLabel.TextSize = 17
 averagePaceLabel.TextSize = 17
 
-
 timeLabel.TextSize = 17
 timeLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
 paceLabel.TextSize = 17
 
 local rebirthsStatsLabel = FastRebTab:AddLabel("Rebirths: "..formatNumber(rebirthsStat.Value).." | Gained: 0")
 rebirthsStatsLabel.TextSize = 17
-
 
 local lastRebirthTime = tick()
 local lastRebirthValue = rebirthsStat.Value

@@ -512,7 +512,7 @@ local sizeSwitch = StrTab:AddSwitch("Auto Size 2", function(bool)
     end
 end, "Size 2")
 
-local Main window:AddTab("Main")
+local Main = window:AddTab("Main")
 
 _G.repToggle = false
 Main:AddSwitch("💪 Fast Auto Farm (Equip Any tool)", function(state)

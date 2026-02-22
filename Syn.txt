@@ -396,7 +396,7 @@ StrTab:AddSwitch("👁️‍🗨️ Hide All Frames", function(state)
     end
 end)
 
-StrTab:AddSwitch("⏳ Anti Afk", function(Value)
+Misc:AddSwitch("⏳ Anti Afk", function(Value)
     if Value then
         _G.AntiAfkActive = true
         
@@ -412,79 +412,92 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
             end
         end)
 
+        -- GUI Oluşturma
         local ScreenGui = Instance.new("ScreenGui")
         local MainFrame = Instance.new("Frame")
         local UICorner = Instance.new("UICorner")
         local UIStroke = Instance.new("UIStroke")
-        local UIGradient = Instance.new("UIGradient")
         
-        ScreenGui.Name = "Syniox_Minimal_AFK"
+        ScreenGui.Name = "Syniox_Modern_Vibe"
         ScreenGui.Parent = game:GetService("CoreGui")
 
+        -- Ana Panel: Çok ince, uzun ve şeffaf (Modern HUD stili)
         MainFrame.Parent = ScreenGui
-        MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-        MainFrame.BackgroundTransparency = 0.1
-        MainFrame.Position = UDim2.new(0.02, 0, 0.4, 0)
-        MainFrame.Size = UDim2.new(0, 110, 0, 0)
-        MainFrame.ClipsDescendants = true
+        MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        MainFrame.BackgroundTransparency = 0.4 -- Arkadaki oyunu hafif gösterir (Premium hissi)
+        MainFrame.Position = UDim2.new(0.5, -125, 0.02, 0) -- Ekranın üst ortasında başlar
+        MainFrame.Size = UDim2.new(0, 250, 0, 35) -- İnce uzun bir bar
         MainFrame.Active = true
         MainFrame.Draggable = true
 
-        UICorner.CornerRadius = UDim.new(0, 12)
+        UICorner.CornerRadius = UDim.new(1, 0) -- Tam yuvarlak (Capsule style)
         UICorner.Parent = MainFrame
 
         UIStroke.Parent = MainFrame
-        UIStroke.Thickness = 2
-        UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        
-        UIGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 50)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 0, 20))
-        }
-        UIGradient.Rotation = 45
-        UIGradient.Parent = UIStroke
+        UIStroke.Thickness = 1.2
+        UIStroke.Color = Color3.fromRGB(255, 255, 255)
+        UIStroke.Transparency = 0.8 -- Çok hafif bir çizgi
 
-        local function CreateStat(name, pos, icon)
+        -- Değerleri Yan Yana Dizmek İçin Layout
+        local UIListLayout = Instance.new("UIListLayout")
+        UIListLayout.Parent = MainFrame
+        UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        UIListLayout.Padding = UDim.new(0, 20)
+
+        local function CreateSmallStat(name, icon)
             local lbl = Instance.new("TextLabel")
             lbl.Name = name
             lbl.Parent = MainFrame
-            lbl.Position = pos
-            lbl.Size = UDim2.new(1, 0, 0, 25)
+            lbl.Size = UDim2.new(0, 60, 1, 0)
             lbl.BackgroundTransparency = 1
             lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-            lbl.TextSize = 14
-            lbl.Font = Enum.Font.GothamBold
+            lbl.TextSize = 12
+            lbl.Font = Enum.Font.GothamMedium
             lbl.Text = icon .. " --"
             return lbl
         end
 
-        local TimerLabel = CreateStat("T", UDim2.new(0, 0, 0, 15), "🕒")
-        local FPSLabel = CreateStat("F", UDim2.new(0, 0, 0, 45), "⚡")
-        local MSLabel = CreateStat("M", UDim2.new(0, 0, 0, 75), "📡")
+        local TimerLabel = CreateSmallStat("T", "🕒")
+        local FPSLabel = CreateSmallStat("F", "⚡")
+        local MSLabel = CreateSmallStat("M", "📡")
 
-        TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 110, 0, 115)}):Play()
+        -- Giriş Animasyonu (Yukarıdan aşağı süzülerek gelir)
+        MainFrame.Position = UDim2.new(0.5, -125, -0.1, 0)
+        TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quart), {
+            Position = UDim2.new(0.5, -125, 0.02, 0)
+        }):Play()
 
+        -- Update Döngüsü
         local startTime = os.time()
         task.spawn(function()
             while _G.AntiAfkActive do
                 local diff = os.time() - startTime
-                TimerLabel.Text = string.format("🕒 %02d:%02d:%02d", math.floor(diff/3600), math.floor((diff%3600)/60), diff%60)
+                TimerLabel.Text = string.format("🕒 %02d:%02d", math.floor(diff/60), diff%60) -- Dakika:Saniye
                 
                 local fps = math.floor(1 / RunService.RenderStepped:Wait())
                 FPSLabel.Text = "⚡ " .. fps
                 
                 local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-                MSLabel.Text = "📡 " .. ping .. "ms"
+                MSLabel.Text = "📡 " .. ping
                 
-                task.wait(0.5)
+                task.wait(1)
             end
         end)
 
     else
         _G.AntiAfkActive = false
         if antiAfkConnection then antiAfkConnection:Disconnect() end
-        local oldGui = game:GetService("CoreGui"):FindFirstChild("Syniox_Minimal_AFK")
-        if oldGui then oldGui:Destroy() end
+        local oldGui = game:GetService("CoreGui"):FindFirstChild("Syniox_Modern_Vibe")
+        if oldGui then 
+            local frame = oldGui:FindFirstChild("MainFrame")
+            if frame then
+                game:GetService("TweenService"):Create(frame, TweenInfo.new(0.5), {Position = UDim2.new(0.5, -125, -0.1, 0)}):Play()
+                task.wait(0.5)
+            end
+            oldGui:Destroy() 
+        end
     end
 end)
 

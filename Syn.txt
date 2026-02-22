@@ -412,91 +412,90 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
             end
         end)
 
-        -- GUI Oluşturma
         local ScreenGui = Instance.new("ScreenGui")
-        local MainFrame = Instance.new("Frame")
-        local UICorner = Instance.new("UICorner")
-        local UIStroke = Instance.new("UIStroke")
+        local Holder = Instance.new("Frame") -- Görünmez taşıyıcı
         
-        ScreenGui.Name = "Syniox_Modern_Vibe"
+        ScreenGui.Name = "Syniox_Neon_HUD"
         ScreenGui.Parent = game:GetService("CoreGui")
 
-        -- Ana Panel: Çok ince, uzun ve şeffaf (Modern HUD stili)
-        MainFrame.Parent = ScreenGui
-        MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        MainFrame.BackgroundTransparency = 0.4 -- Arkadaki oyunu hafif gösterir (Premium hissi)
-        MainFrame.Position = UDim2.new(0.5, -125, 0.02, 0) -- Ekranın üst ortasında başlar
-        MainFrame.Size = UDim2.new(0, 250, 0, 35) -- İnce uzun bir bar
-        MainFrame.Active = true
-        MainFrame.Draggable = true
+        Holder.Name = "Holder"
+        Holder.Parent = ScreenGui
+        Holder.Size = UDim2.new(0, 150, 0, 100)
+        Holder.Position = UDim2.new(1, 20, 0.4, 0) -- Başlangıçta ekranın dışında (Sağda)
+        Holder.BackgroundTransparency = 1
 
-        UICorner.CornerRadius = UDim.new(1, 0) -- Tam yuvarlak (Capsule style)
-        UICorner.Parent = MainFrame
+        local function CreateNeonStat(name, icon, pos)
+            local Frame = Instance.new("Frame")
+            local GlowLine = Instance.new("Frame")
+            local Text = Instance.new("TextLabel")
+            local Gradient = Instance.new("UIGradient")
 
-        UIStroke.Parent = MainFrame
-        UIStroke.Thickness = 1.2
-        UIStroke.Color = Color3.fromRGB(255, 255, 255)
-        UIStroke.Transparency = 0.8 -- Çok hafif bir çizgi
+            Frame.Parent = Holder
+            Frame.Size = UDim2.new(1, 0, 0, 25)
+            Frame.Position = pos
+            Frame.BackgroundTransparency = 1
 
-        -- Değerleri Yan Yana Dizmek İçin Layout
-        local UIListLayout = Instance.new("UIListLayout")
-        UIListLayout.Parent = MainFrame
-        UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        UIListLayout.Padding = UDim.new(0, 20)
+            -- Neon Alt Çizgi
+            GlowLine.Parent = Frame
+            GlowLine.Size = UDim2.new(0, 0, 0, 1) -- Animasyonla uzayacak
+            GlowLine.Position = UDim2.new(0, 0, 1, 0)
+            GlowLine.BorderSizePixel = 0
+            
+            Gradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0), 1) -- Uca doğru şeffaflaşır
+            }
+            Gradient.Parent = GlowLine
 
-        local function CreateSmallStat(name, icon)
-            local lbl = Instance.new("TextLabel")
-            lbl.Name = name
-            lbl.Parent = MainFrame
-            lbl.Size = UDim2.new(0, 60, 1, 0)
-            lbl.BackgroundTransparency = 1
-            lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-            lbl.TextSize = 12
-            lbl.Font = Enum.Font.GothamMedium
-            lbl.Text = icon .. " --"
-            return lbl
+            Text.Parent = Frame
+            Text.Size = UDim2.new(1, 0, 1, -2)
+            Text.BackgroundTransparency = 1
+            Text.Text = icon .. " 0"
+            Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Text.TextSize = 14
+            Text.Font = Enum.Font.Code -- Yazılımcı/Hacker fontu
+            Text.TextXAlignment = Enum.TextXAlignment.Left
+
+            return Text, GlowLine
         end
 
-        local TimerLabel = CreateSmallStat("T", "🕒")
-        local FPSLabel = CreateSmallStat("F", "⚡")
-        local MSLabel = CreateSmallStat("M", "📡")
+        local TimerText, TimerLine = CreateNeonStat("Timer", "󱎫", UDim2.new(0, 0, 0, 0))
+        local FPSText, FPSLine = CreateNeonStat("FPS", "⚡", UDim2.new(0, 0, 0, 30))
+        local MSText, MSLine = CreateNeonStat("MS", "📡", UDim2.new(0, 0, 0, 60))
 
-        -- Giriş Animasyonu (Yukarıdan aşağı süzülerek gelir)
-        MainFrame.Position = UDim2.new(0.5, -125, -0.1, 0)
-        TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quart), {
-            Position = UDim2.new(0.5, -125, 0.02, 0)
+        -- Geliş Animasyonu (Efsane Geçiş)
+        TweenService:Create(Holder, TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+            Position = UDim2.new(1, -140, 0.4, 0) -- Ekranın içine girer
         }):Play()
 
-        -- Update Döngüsü
+        task.delay(0.5, function()
+            local info = TweenInfo.new(1, Enum.EasingStyle.Quart)
+            TweenService:Create(TimerLine, info, {Size = UDim2.new(0.8, 0, 0, 1)}):Play()
+            TweenService:Create(FPSLine, info, {Size = UDim2.new(0.6, 0, 0, 1)}):Play()
+            TweenService:Create(MSLine, info, {Size = UDim2.new(0.4, 0, 0, 1)}):Play()
+        end)
+
+        -- Update
         local startTime = os.time()
         task.spawn(function()
             while _G.AntiAfkActive do
                 local diff = os.time() - startTime
-                TimerLabel.Text = string.format("🕒 %02d:%02d", math.floor(diff/60), diff%60) -- Dakika:Saniye
-                
-                local fps = math.floor(1 / RunService.RenderStepped:Wait())
-                FPSLabel.Text = "⚡ " .. fps
-                
-                local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-                MSLabel.Text = "📡 " .. ping
-                
-                task.wait(1)
+                TimerText.Text = string.format("󱎫 %02d:%02d:%02d", math.floor(diff/3600), math.floor((diff%3600)/60), diff%60)
+                FPSText.Text = "⚡ " .. math.floor(1 / RunService.RenderStepped:Wait())
+                MSText.Text = "📡 " .. math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue()) .. "ms"
+                task.wait(0.5)
             end
         end)
 
     else
         _G.AntiAfkActive = false
         if antiAfkConnection then antiAfkConnection:Disconnect() end
-        local oldGui = game:GetService("CoreGui"):FindFirstChild("Syniox_Modern_Vibe")
-        if oldGui then 
-            local frame = oldGui:FindFirstChild("MainFrame")
-            if frame then
-                game:GetService("TweenService"):Create(frame, TweenInfo.new(0.5), {Position = UDim2.new(0.5, -125, -0.1, 0)}):Play()
-                task.wait(0.5)
-            end
-            oldGui:Destroy() 
+        local oldGui = game:GetService("CoreGui"):FindFirstChild("Syniox_Neon_HUD")
+        if oldGui then
+            local holder = oldGui:FindFirstChild("Holder")
+            TweenService:Create(holder, TweenInfo.new(0.5), {Position = UDim2.new(1, 20, 0.4, 0)}):Play()
+            task.wait(0.5)
+            oldGui:Destroy()
         end
     end
 end)

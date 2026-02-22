@@ -127,7 +127,6 @@ local function calculatePaceOnRebirth()
     end
 end
 
-RebTab:AddLabel("")
 RebTab:AddLabel("-------------------------")
 
 RebTab:AddSwitch("🔄 Auto Rebirth Farm", function(state)
@@ -412,77 +411,78 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
             end
         end)
 
+        -- GUI - Minimalist Side Badge
         local ScreenGui = Instance.new("ScreenGui")
-        local Holder = Instance.new("Frame") -- Görünmez taşıyıcı
-        
-        ScreenGui.Name = "Syniox_Neon_HUD"
+        local MainFrame = Instance.new("Frame")
+        local UICorner = Instance.new("UICorner")
+        local UIStroke = Instance.new("UIStroke")
+        local ContentFrame = Instance.new("Frame")
+        local UIListLayout = Instance.new("UIListLayout")
+
+        ScreenGui.Name = "Str_Premium_AFK"
         ScreenGui.Parent = game:GetService("CoreGui")
 
-        Holder.Name = "Holder"
-        Holder.Parent = ScreenGui
-        Holder.Size = UDim2.new(0, 150, 0, 100)
-        Holder.Position = UDim2.new(1, 20, 0.4, 0) -- Başlangıçta ekranın dışında (Sağda)
-        Holder.BackgroundTransparency = 1
+        -- Ana Gövde (Minimalist & Dark)
+        MainFrame.Name = "MainFrame"
+        MainFrame.Parent = ScreenGui
+        MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+        MainFrame.BackgroundTransparency = 0.2
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Position = UDim2.new(1, 20, 0.5, -50) -- Sağdan giriş için dışarıda
+        MainFrame.Size = UDim2.new(0, 140, 0, 95)
+        
+        UICorner.CornerRadius = UDim.new(0, 12)
+        UICorner.Parent = MainFrame
 
-        local function CreateNeonStat(name, icon, pos)
-            local Frame = Instance.new("Frame")
-            local GlowLine = Instance.new("Frame")
-            local Text = Instance.new("TextLabel")
-            local Gradient = Instance.new("UIGradient")
+        -- İnce şık kenarlık
+        UIStroke.Parent = MainFrame
+        UIStroke.Thickness = 1.5
+        UIStroke.Color = Color3.fromRGB(40, 40, 40) -- Kırmızı yerine koyu gri (daha premium)
+        UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-            Frame.Parent = Holder
-            Frame.Size = UDim2.new(1, 0, 0, 25)
-            Frame.Position = pos
-            Frame.BackgroundTransparency = 1
+        -- İçerik Düzeni
+        ContentFrame.Parent = MainFrame
+        ContentFrame.BackgroundTransparency = 1
+        ContentFrame.Size = UDim2.new(1, 0, 1, 0)
+        
+        UIListLayout.Parent = ContentFrame
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        UIListLayout.Padding = UDim.new(0, 2)
+        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
-            -- Neon Alt Çizgi
-            GlowLine.Parent = Frame
-            GlowLine.Size = UDim2.new(0, 0, 0, 1) -- Animasyonla uzayacak
-            GlowLine.Position = UDim2.new(0, 0, 1, 0)
-            GlowLine.BorderSizePixel = 0
-            
-            Gradient.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0), 1) -- Uca doğru şeffaflaşır
-            }
-            Gradient.Parent = GlowLine
-
-            Text.Parent = Frame
-            Text.Size = UDim2.new(1, 0, 1, -2)
-            Text.BackgroundTransparency = 1
-            Text.Text = icon .. " 0"
-            Text.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Text.TextSize = 14
-            Text.Font = Enum.Font.Code -- Yazılımcı/Hacker fontu
-            Text.TextXAlignment = Enum.TextXAlignment.Left
-
-            return Text, GlowLine
+        local function CreateRow(icon, color)
+            local lbl = Instance.new("TextLabel")
+            lbl.Parent = ContentFrame
+            lbl.Size = UDim2.new(1, -20, 0, 25)
+            lbl.BackgroundTransparency = 1
+            lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+            lbl.TextSize = 13
+            lbl.Font = Enum.Font.GothamMedium
+            lbl.RichText = true
+            lbl.Text = string.format("<font color='rgb(%d,%d,%d)'>%s</font> --", color.R*255, color.G*255, color.B*255, icon)
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            return lbl
         end
 
-        local TimerText, TimerLine = CreateNeonStat("Timer", "󱎫", UDim2.new(0, 0, 0, 0))
-        local FPSText, FPSLine = CreateNeonStat("FPS", "⚡", UDim2.new(0, 0, 0, 30))
-        local MSText, MSLine = CreateNeonStat("MS", "📡", UDim2.new(0, 0, 0, 60))
+        -- İkonlar (Lucide stilinde sade)
+        local TimerLabel = CreateRow("🕒", Color3.fromRGB(255, 50, 50))
+        local FPSLabel = CreateRow("🚀", Color3.fromRGB(50, 255, 100))
+        local MSLabel = CreateRow("📡", Color3.fromRGB(50, 150, 255))
 
-        -- Geliş Animasyonu (Efsane Geçiş)
-        TweenService:Create(Holder, TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            Position = UDim2.new(1, -140, 0.4, 0) -- Ekranın içine girer
+        -- Geliş Animasyonu (Sağdan kayarak oturma)
+        TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+            Position = UDim2.new(1, -155, 0.5, -50)
         }):Play()
 
-        task.delay(0.5, function()
-            local info = TweenInfo.new(1, Enum.EasingStyle.Quart)
-            TweenService:Create(TimerLine, info, {Size = UDim2.new(0.8, 0, 0, 1)}):Play()
-            TweenService:Create(FPSLine, info, {Size = UDim2.new(0.6, 0, 0, 1)}):Play()
-            TweenService:Create(MSLine, info, {Size = UDim2.new(0.4, 0, 0, 1)}):Play()
-        end)
-
-        -- Update
+        -- Update Döngüsü
         local startTime = os.time()
         task.spawn(function()
             while _G.AntiAfkActive do
                 local diff = os.time() - startTime
-                TimerText.Text = string.format("󱎫 %02d:%02d:%02d", math.floor(diff/3600), math.floor((diff%3600)/60), diff%60)
-                FPSText.Text = "⚡ " .. math.floor(1 / RunService.RenderStepped:Wait())
-                MSText.Text = "📡 " .. math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue()) .. "ms"
+                TimerLabel.Text = string.format("<font color='rgb(255,50,50)'>🕒</font> %02d:%02d:%02d", math.floor(diff/3600), math.floor((diff%3600)/60), diff%60)
+                FPSLabel.Text = string.format("<font color='rgb(50,255,100)'>🚀</font> %d FPS", math.floor(1 / RunService.RenderStepped:Wait()))
+                MSLabel.Text = string.format("<font color='rgb(50,150,255)'>📡</font> %d MS", math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue()))
                 task.wait(0.5)
             end
         end)
@@ -490,11 +490,11 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
     else
         _G.AntiAfkActive = false
         if antiAfkConnection then antiAfkConnection:Disconnect() end
-        local oldGui = game:GetService("CoreGui"):FindFirstChild("Syniox_Neon_HUD")
+        local oldGui = game:GetService("CoreGui"):FindFirstChild("Str_Premium_AFK")
         if oldGui then
-            local holder = oldGui:FindFirstChild("Holder")
-            TweenService:Create(holder, TweenInfo.new(0.5), {Position = UDim2.new(1, 20, 0.4, 0)}):Play()
-            task.wait(0.5)
+            local frame = oldGui:FindFirstChild("MainFrame")
+            TweenService:Create(frame, TweenInfo.new(0.4), {Position = UDim2.new(1, 20, 0.5, -50)}):Play()
+            task.wait(0.4)
             oldGui:Destroy()
         end
     end

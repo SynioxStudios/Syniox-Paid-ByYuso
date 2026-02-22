@@ -396,7 +396,7 @@ StrTab:AddSwitch("👁️‍🗨️ Hide All Frames", function(state)
     end
 end)
 
-Misc:AddSwitch("⏳ Anti Afk", function(Value)
+StrTab:AddSwitch("⏳ Anti Afk", function(Value)
     if Value then
         _G.AntiAfkActive = true
         
@@ -421,12 +421,11 @@ Misc:AddSwitch("⏳ Anti Afk", function(Value)
         ScreenGui.Name = "Syniox_Minimal_AFK"
         ScreenGui.Parent = game:GetService("CoreGui")
 
-        -- Ana Panel (Küçük ve Karemsi)
         MainFrame.Parent = ScreenGui
         MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
         MainFrame.BackgroundTransparency = 0.1
-        MainFrame.Position = UDim2.new(0.02, 0, 0.4, 0) -- Sol kenara yakın
-        MainFrame.Size = UDim2.new(0, 110, 0, 0) -- Animasyon başlangıcı
+        MainFrame.Position = UDim2.new(0.02, 0, 0.4, 0)
+        MainFrame.Size = UDim2.new(0, 110, 0, 0)
         MainFrame.ClipsDescendants = true
         MainFrame.Active = true
         MainFrame.Draggable = true
@@ -434,7 +433,6 @@ Misc:AddSwitch("⏳ Anti Afk", function(Value)
         UICorner.CornerRadius = UDim.new(0, 12)
         UICorner.Parent = MainFrame
 
-        -- Parlayan Kenarlık
         UIStroke.Parent = MainFrame
         UIStroke.Thickness = 2
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -446,7 +444,6 @@ Misc:AddSwitch("⏳ Anti Afk", function(Value)
         UIGradient.Rotation = 45
         UIGradient.Parent = UIStroke
 
-        -- Değer Fonksiyonu (Sadece rakamlar ve ikonlar)
         local function CreateStat(name, pos, icon)
             local lbl = Instance.new("TextLabel")
             lbl.Name = name
@@ -456,17 +453,15 @@ Misc:AddSwitch("⏳ Anti Afk", function(Value)
             lbl.BackgroundTransparency = 1
             lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
             lbl.TextSize = 14
-            lbl.Font = Enum.Font.GothamBold -- Yazı yok ama rakamlar okunaklı olmalı
+            lbl.Font = Enum.Font.GothamBold
             lbl.Text = icon .. " --"
             return lbl
         end
 
-        -- İkonlu Değerler (Yazısız)
         local TimerLabel = CreateStat("T", UDim2.new(0, 0, 0, 15), "🕒")
         local FPSLabel = CreateStat("F", UDim2.new(0, 0, 0, 45), "⚡")
         local MSLabel = CreateStat("M", UDim2.new(0, 0, 0, 75), "📡")
 
-        -- Giriş Animasyonu
         TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 110, 0, 115)}):Play()
 
         local startTime = os.time()

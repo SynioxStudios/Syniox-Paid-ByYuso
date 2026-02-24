@@ -853,22 +853,6 @@ toolFolder:AddSwitch("🧘 Situps + 🥊 Punch", function(bool)
     if bool then manageToolCombo("Situps") end
 end)
 
-Main:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
-    autoEatEnabled = state
-    if state then
-        task.spawn(function()
-            while autoEatEnabled do
-                local egg = player.Backpack:FindFirstChild("Protein Egg")
-                if egg then
-                    egg.Parent = player.Character
-                    pcall(function() egg:Activate() end)
-                end
-                task.wait(1800)
-            end
-        end)
-    end
-end)
-
 function gettool()
     for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
         if v.Name == "Punch" and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
@@ -928,6 +912,22 @@ toolFolder:AddSwitch("🌴 Jungle Rock 10M", function(Value)
             end
         end
     end)
+end)
+
+Main:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(1800)
+            end
+        end)
+    end
 end)
 
 Main:AddSwitch("🥚 Auto Eat Egg (60 Min)", function(state)

@@ -1312,20 +1312,22 @@ rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
     end
 end)
 
-local LookDura = window:AddTab("Stats V2")
+local LookDura = window:AddTab("Stats v2")
 local SelectPlayerName = ""
 
 local PlayerDrop = LookDura:AddDropdown("Select Player", function(Value)
     SelectPlayerName = Value:match("| (.+)")
+    previousValues = {}
 end)
 
-local function UpdatePlayerList()
-    PlayerDrop:Clear() -- Eğer UI kütüphanen desteklemiyorsa bu satırı silebilirsin
-    for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-        PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
-    end
+local Playerslist = {}
+for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
+    local displayName = Plr.DisplayName .. " | " .. Plr.Name
+    table.insert(Playerslist, displayName)
 end
-UpdatePlayerList()
+for _, AddPlr in ipairs(Playerslist) do
+    PlayerDrop:Add(AddPlr)
+end
 
 local function FormatNumberWithCommas(number)
     local formatted = tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse()

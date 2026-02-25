@@ -1312,22 +1312,20 @@ rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
     end
 end)
 
-local LookDura = window:AddTab("Stats")
+local LookDura = window:AddTab("Stats V2")
 local SelectPlayerName = ""
 
 local PlayerDrop = LookDura:AddDropdown("Select Player", function(Value)
     SelectPlayerName = Value:match("| (.+)")
-    previousValues = {}
 end)
 
-local Playerslist = {}
-for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-    local displayName = Plr.DisplayName .. " | " .. Plr.Name
-    table.insert(Playerslist, displayName)
+local function UpdatePlayerList()
+    PlayerDrop:Clear() -- Eğer UI kütüphanen desteklemiyorsa bu satırı silebilirsin
+    for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
+        PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
+    end
 end
-for _, AddPlr in ipairs(Playerslist) do
-    PlayerDrop:Add(AddPlr)
-end
+UpdatePlayerList()
 
 local function FormatNumberWithCommas(number)
     local formatted = tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse()
@@ -1406,18 +1404,15 @@ task.spawn(function()
 
                 local char = player.Character
                 local lChar = localPlayer.Character
-                local myStr = (localPlayer.leaderstats:FindFirstChild("Strength") and localPlayer.leaderstats.Strength.Value) or 1
+                local myStr = (localPlayer:FindFirstChild("leaderstats") and localPlayer.leaderstats:FindFirstChild("Strength") and localPlayer.leaderstats.Strength.Value) or 1
                 
                 if char and char:FindFirstChild("Humanoid") then
                     local currentHP = math.floor(char.Humanoid.Health)
                     local maxHP = math.floor(char.Humanoid.MaxHealth)
-                    
                     EnemyHealthLabel.Text = "Target Health: [ " .. FormatNumberWithCommas(currentHP) .. " / " .. FormatNumberWithCommas(maxHP) .. " ]"
                     MyDamageLabel.Text = "Your Damage: " .. FormatAbbreviated(myStr)
-                    
                     local htkCalc = math.ceil(currentHP / myStr)
                     if htkCalc <= 0 then htkCalc = 1 end
-                    
                     if currentHP <= 0 then
                         FinalHTKLabel.Text = "Hits To Kill: TARGET DEAD"
                         FinalHTKLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
@@ -1427,7 +1422,8 @@ task.spawn(function()
                     end
                 end
 
-                local pets = player:FindFirstChild("petFolder")
+                -- PET SİSTEMİ DÜZELTİLMİŞ KISIM
+                local pets = player:FindFirstChild("petFolder") or player:FindFirstChild("petInventory")
                 if pets then
                     local equippedPets = {}
                     for _, pet in pairs(pets:GetChildren()) do
@@ -1438,9 +1434,14 @@ task.spawn(function()
 
                     for i = 1, 8 do
                         if equippedPets[i] then
-                            local petName = equippedPets[i].Name
-                            local petLvl = equippedPets[i]:FindFirstChild("level") and equippedPets[i].level.Value or "?"
-                            PetLabels[i].Text = "🐾 " .. i .. ". " .. petName .. " (Lvl " .. petLvl .. ")"
+                            local pet = equippedPets[i]
+                            local petLvl = pet:FindFirstChild("level") and pet.level.Value or "?"
+                            
+                            -- Çarpanları çekme (Strength, Agility vb.)
+                            local sMult = pet:FindFirstChild("strengthMulti") and pet.strengthMulti.Value or 0
+                            local dMult = pet:FindFirstChild("durabilityMulti") and pet.durabilityMulti.Value or 0
+                            
+                            PetLabels[i].Text = string.format("🐾 %d. %s (Lvl %s) [x%s S | x%s D]", i, pet.Name, tostring(petLvl), tostring(sMult), tostring(dMult))
                         else
                             PetLabels[i].Text = "Pet " .. i .. ": Empty"
                         end
@@ -1452,10 +1453,6 @@ task.spawn(function()
         end
     end
 end)
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
 
 local Gift = window:AddTab("Gift")
 

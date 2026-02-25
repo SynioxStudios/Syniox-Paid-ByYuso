@@ -1312,7 +1312,7 @@ rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
     end
 end)
 
-local LookDura = window:AddTab("Stats v2")
+local LookDura = window:AddTab("Stats V2")
 local SelectPlayerName = ""
 
 local PlayerDrop = LookDura:AddDropdown("Select Player", function(Value)

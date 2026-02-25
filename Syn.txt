@@ -12,18 +12,18 @@ local displayName = player.DisplayName
 
 local window = library:AddWindow("Syniox Paid | Muscle Legends || HELLO - ".. displayName, {
     title_bar = {
-        Color3.fromRGB(180, 0, 255), -- Parlak Neon Mor
-        Color3.fromRGB(60, 0, 100),  -- Koyu Mürdüm
-        Color3.fromRGB(0, 0, 0)      -- Tam Siyah
+        Color3.fromRGB(180, 0, 255),
+        Color3.fromRGB(60, 0, 100),
+        Color3.fromRGB(0, 0, 0)
     }, 
     title_bar_transparency = 0.1, 
     background = {
-        Color3.fromRGB(10, 5, 15),    -- Koyu Morumsu Siyah
-        Color3.fromRGB(15, 10, 25),   -- Ara Ton
-        Color3.fromRGB(0, 0, 0)       -- Saf Siyah
+        Color3.fromRGB(10, 5, 15),
+        Color3.fromRGB(15, 10, 25),
+        Color3.fromRGB(0, 0, 0)
     }, 
     background_transparency = 0.1, 
-    main_color = Color3.fromRGB(220, 100, 255), -- Yumuşak Lavanta Detaylar
+    main_color = Color3.fromRGB(30, 0, 200),
     min_size = Vector2.new(450, 350), 
     can_resize = true 
 })

@@ -1315,21 +1315,22 @@ end)
 local LookDura = window:AddTab("Stats V2")
 local SelectPlayerName = ""
 
-local StatsFolder = LookDura:AddFolder("Stats V2")
+local StatsFolder = LookDura:AddFolder(" 👤 Stats V2")
 
 local PlayerDrop = StatsFolder:AddDropdown("Select Player", function(Value)
     SelectPlayerName = Value:match("| (.+)")
-    previousValues = {}
 end)
 
-local Playerslist = {}
-for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-    local displayName = Plr.DisplayName .. " | " .. Plr.Name
-    table.insert(Playerslist, displayName)
+local function UpdatePlayerList()
+    PlayerDrop:Clear()
+    for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
+        PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
+    end
 end
-for _, AddPlr in ipairs(Playerslist) do
-    PlayerDrop:Add(AddPlr)
-end
+UpdatePlayerList()
+
+game:GetService("Players").PlayerAdded:Connect(UpdatePlayerList)
+game:GetService("Players").PlayerRemoving:Connect(UpdatePlayerList)
 
 local function FormatNumberWithCommas(number)
     local formatted = tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse()
@@ -1365,6 +1366,12 @@ local EnemyHealthLabel = StatsFolder:AddLabel("Target Health: 0 / 0")
 local MyDamageLabel = StatsFolder:AddLabel("Your Damage: 0")
 local FinalHTKLabel = StatsFolder:AddLabel("Hits To Kill: 0")
 StatsFolder:AddLabel("------------------------------")
+StatsFolder:AddLabel("🐾 Equipped Pets:")
+local PetLabels = {}
+for i = 1, 8 do
+    PetLabels[i] = StatsFolder:AddLabel(i .. ". Empty")
+end
+StatsFolder:AddLabel("------------------------------")
 
 task.spawn(function()
     while task.wait(0.5) do
@@ -1383,6 +1390,26 @@ task.spawn(function()
                 if leaderstats then
                     if leaderstats:FindFirstChild("Strength") then Update.Text = "💪 Strength: " .. FormatDisplay(leaderstats.Strength.Value) end
                     if leaderstats:FindFirstChild("Rebirths") then Update2.Text = "🔄 Rebirths: " .. FormatDisplay(leaderstats.Rebirths.Value) end
+                end
+
+                local equippedPets = {}
+                local petFolder = player:FindFirstChild("petFolder")
+                if petFolder then
+                    for _, petFolderInstance in pairs(petFolder:GetChildren()) do
+                        for _, pet in pairs(petFolderInstance:GetChildren()) do
+                            if pet:FindFirstChild("equipped") and pet.equipped.Value == true then
+                                table.insert(equippedPets, pet.Name)
+                            end
+                        end
+                    end
+                end
+
+                for i = 1, 8 do
+                    if equippedPets[i] then
+                        PetLabels[i].Text = i .. ". 🐾 " .. equippedPets[i]
+                    else
+                        PetLabels[i].Text = i .. ". Empty"
+                    end
                 end
 
                 local char = player.Character
@@ -1404,7 +1431,7 @@ task.spawn(function()
     end
 end)
 
-local SpyFolder = LookDura:AddFolder("Spy Stats")
+local SpyFolder = LookDura:AddFolder(" 📊 Spy Stats")
 local SelectPlayerName = ""
 
 local statsHistory = {Strength = {}, Rebirth = {}, Durability = {}}

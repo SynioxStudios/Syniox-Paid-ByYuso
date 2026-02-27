@@ -1407,13 +1407,17 @@ end)
 local SpyFolder = LookDura:AddFolder("Spy Stats")
 local SelectPlayerName = ""
 
-local statsHistory = {}
-local initialStats = {}
+local statsHistory = {Strength = {}, Rebirth = {}, Durability = {}}
+local initialStats = {Strength = nil, Rebirth = nil, Durability = nil}
+local offsets = {Strength = 0, Durability = 0}
+local lastRaw = {Strength = 0, Durability = 0}
 
 local PlayerDrop = SpyFolder:AddDropdown("Select Player", function(Value)
     SelectPlayerName = Value:match("| (.+)")
-    statsHistory = {}
-    initialStats = {}
+    statsHistory = {Strength = {}, Rebirth = {}, Durability = {}}
+    initialStats = {Strength = nil, Rebirth = nil, Durability = nil}
+    offsets = {Strength = 0, Durability = 0}
+    lastRaw = {Strength = 0, Durability = 0}
 end)
 
 for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
@@ -1425,55 +1429,75 @@ game:GetService("Players").PlayerAdded:Connect(function(Plr)
 end)
 
 local function FormatAbbreviated(number)
-    if number >= 1e15 then return string.format("%.2fQa", number/1e15) end
-    if number >= 1e12 then return string.format("%.2fT", number/1e12) end
-    if number >= 1e9 then return string.format("%.2fB", number/1e9) end
-    if number >= 1e6 then return string.format("%.2fM", number/1e6) end
-    if number >= 1e3 then return string.format("%.2fK", number/1e3) end
+    local absNum = math.abs(number)
+    if absNum >= 1e15 then return string.format("%.2fQa", number/1e15) end
+    if absNum >= 1e12 then return string.format("%.2fT", number/1e12) end
+    if absNum >= 1e9 then return string.format("%.2fB", number/1e9) end
+    if absNum >= 1e6 then return string.format("%.2fM", number/1e6) end
+    if absNum >= 1e3 then return string.format("%.2fK", number/1e3) end
     return string.format("%.2f", number)
 end
 
-local function GetStatPace(playerName, currentValue)
-    if not statsHistory[playerName] then statsHistory[playerName] = {} end
-    local history = statsHistory[playerName]
-    table.insert(history, {time = tick(), value = currentValue})
-    while #history > 0 and tick() - history[1].time > 10 do
-        table.remove(history, 1)
-    end
+local function GetStatPace(history)
     if #history >= 2 then
         local deltaValue = history[#history].value - history[1].value
         local deltaTime = history[#history].time - history[1].time
+        if deltaTime <= 0 then return 0 end
         return deltaValue / deltaTime
     end
     return 0
 end
 
-local UpdateStr = SpyFolder:AddLabel("💪 Strength: -")
-local UpdateGained = SpyFolder:AddLabel("📈 Gained: -")
-local UpdatePace = SpyFolder:AddLabel("⏱️ Hour: - | Day: -")
-local UpdateWeek = SpyFolder:AddLabel("🗓️ Weekly: -")
+local UpdateStrength = SpyFolder:AddLabel("💪 Total Strength: -")
+local UpdateStrengthPace = SpyFolder:AddLabel("📈 Strength: -/Hr | -/Day | -/Week")
+SpyFolder:AddLabel("------------------------------")
+local UpdateDurability = SpyFolder:AddLabel("🛡️ Total Durability: -")
+local UpdateDurabilityPace = SpyFolder:AddLabel("📈 Durability: -/Hr | -/Day | -/Week")
+SpyFolder:AddLabel("------------------------------")
+local UpdateRebirth = SpyFolder:AddLabel("🔄 Rebirth: -")
+local UpdateRebirthPace = SpyFolder:AddLabel("📈 Rebirth: -/Hr | -/Day | -/Week")
 
 task.spawn(function()
     while task.wait(1) do
         if SelectPlayerName ~= "" then
             local player = game.Players:FindFirstChild(SelectPlayerName)
             if player and player:FindFirstChild("leaderstats") then
-                local strStat = player.leaderstats:FindFirstChild("Strength")
-                if strStat then
-                    if not initialStats[player.Name] then initialStats[player.Name] = strStat.Value end
-                    
-                    local currentStr = strStat.Value
-                    local pacePerSecond = GetStatPace(player.Name, currentStr)
-                    local totalGained = currentStr - initialStats[player.Name]
-                    
-                    local perHour = pacePerSecond * 3600
-                    local perDay = pacePerSecond * 86400
-                    local perWeek = pacePerSecond * 604800
+                local lStats = player.leaderstats
+                local strStat = lStats:FindFirstChild("Strength")
+                local rbStat = lStats:FindFirstChild("Rebirths")
+                local duraStat = player:FindFirstChild("Durability")
 
-                    UpdateStr.Text = "💪 Strength: " .. FormatAbbreviated(currentStr) .. " (+" .. FormatAbbreviated(pacePerSecond) .. "/s)"
-                    UpdateGained.Text = "📈 Gained: " .. FormatAbbreviated(totalGained)
-                    UpdatePace.Text = "⏱️ Hr: " .. FormatAbbreviated(perHour) .. " | Day: " .. FormatAbbreviated(perDay)
-                    UpdateWeek.Text = "🗓️ Weekly: " .. FormatAbbreviated(perWeek)
+                local toProcess = {
+                    {Stat = strStat, Name = "Strength", Label = UpdateStrength, PaceLabel = UpdateStrengthPace, Icon = "💪", IsAccumulated = true},
+                    {Stat = duraStat, Name = "Durability", Label = UpdateDurability, PaceLabel = UpdateDurabilityPace, Icon = "🛡️", IsAccumulated = true},
+                    {Stat = rbStat, Name = "Rebirth", Label = UpdateRebirth, PaceLabel = UpdateRebirthPace, Icon = "🔄", IsAccumulated = false}
+                }
+
+                for _, data in ipairs(toProcess) do
+                    if data.Stat then
+                        local rawValue = data.Stat.Value
+                        if initialStats[data.Name] == nil then initialStats[data.Name] = rawValue end
+
+                        local displayValue = rawValue
+                        if data.IsAccumulated then
+                            if rawValue < lastRaw[data.Name] then
+                                offsets[data.Name] = offsets[data.Name] + lastRaw[data.Name]
+                            end
+                            lastRaw[data.Name] = rawValue
+                            displayValue = rawValue + offsets[data.Name]
+                        end
+
+                        table.insert(statsHistory[data.Name], {time = tick(), value = displayValue})
+                        while #statsHistory[data.Name] > 0 and tick() - statsHistory[data.Name][1].time > 10 do
+                            table.remove(statsHistory[data.Name], 1)
+                        end
+
+                        local pace = GetStatPace(statsHistory[data.Name])
+                        local gained = displayValue - initialStats[data.Name]
+                        
+                        data.Label.Text = string.format("%s Total %s: %s (Gained: %s)", data.Icon, data.Name, FormatAbbreviated(displayValue), FormatAbbreviated(gained))
+                        data.PaceLabel.Text = string.format("📈 %s: %s/Hr | %s/Day | %s/Week", data.Name, FormatAbbreviated(pace * 3600), FormatAbbreviated(pace * 86400), FormatAbbreviated(pace * 604800))
+                    end
                 end
             end
         end

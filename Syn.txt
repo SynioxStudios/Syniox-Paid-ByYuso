@@ -1087,6 +1087,10 @@ local playerWhitelist = {}
 local targetPlayerNames = {}
 local selectedFollowTarget = nil
 _G.FollowToTarget = false
+local autoGoodKarma = false
+local autoBadKarma = false
+local autoEquipPunch = false
+local autoPunchNoAnim = false
 
 Killer:AddLabel("--- Misc ---")
 

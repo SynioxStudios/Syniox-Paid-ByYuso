@@ -552,7 +552,7 @@ end)
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local toolFolder = AutoFarm:AddFolder(" 💨 OP Tools")
+local toolFolder = Main:AddFolder(" 💨 OP Tools")
 
 local function manageToolCombo(toolName)
     task.spawn(function()

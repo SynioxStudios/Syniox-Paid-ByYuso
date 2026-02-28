@@ -416,38 +416,24 @@ local sizeSwitch = StrTab:AddSwitch("Auto Size 2", function(bool)
 end, "Size 2")
 
 local Main = window:AddTab("Main")
-local repsPerTick = 12
+local repsPerTick = 1
 
-Main:AddTextBox("Rep Speed", function(value)
+Main:AddTextBox("🚀 Thread Speed", function(value)
     local num = tonumber(value)
     if num and num > 0 then 
-        repsPerTick = math.floor(num) 
+        repsPerTick = math.floor(num)
+    else
+        repsPerTick = 1
     end
-end, {placeholder = "Rep Amount (Default: 12)"})
-
-_G.repToggle = false
-Main:AddSwitch("💪 Fast Auto Farm (Equip Any tool)", function(state)
-    _G.repToggle = state
-    task.spawn(function()
-        while _G.repToggle do
-            local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
-            if event then
-                for i = 1, repsPerTick do
-                    if not _G.repToggle then break end
-                    event:FireServer("rep")
-                end
-            end
-            task.wait(0.01)
-        end
-    end)
-end)
+end, {placeholder = "Enter Amount (Default: 1)"})
 
 local function manageTool(toolName)
     task.spawn(function()
+        local player = game.Players.LocalPlayer
+        local event = player:WaitForChild("muscleEvent", 5)
+
         while _G[toolName.."On"] do
-            local player = game.Players.LocalPlayer
             local character = player.Character
-            
             if character then
                 local tool = character:FindFirstChild(toolName) or player.Backpack:FindFirstChild(toolName)
                 
@@ -456,7 +442,6 @@ local function manageTool(toolName)
                         tool.Parent = character
                     end
                     
-                    local event = player:FindFirstChild("muscleEvent")
                     if event then
                         for i = 1, repsPerTick do
                             if not _G[toolName.."On"] then break end
@@ -470,13 +455,8 @@ local function manageTool(toolName)
             task.wait(0.01)
         end
 
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if character then
-            local tool = character:FindFirstChild(toolName)
-            if tool then
-                tool.Parent = player.Backpack
-            end
+        if player.Character and player.Character:FindFirstChild(toolName) then
+            player.Character[toolName].Parent = player.Backpack
         end
     end)
 end
@@ -569,41 +549,38 @@ TreadmillFolder:AddButton("⛔ Stop Treadmill Farm", function()
     stopTreadmill()
 end)
 
-local toolFolder = Main:AddFolder(" 💨 OP Tools V2")
+local toolFolder = Main:AddFolder("💨 OP Tools V2")
 
 local function manageToolCombo(toolName)
     task.spawn(function()
         while _G[toolName.."On"] do
-            local character = LocalPlayer.Character
-            local hum = character and character:FindFirstChildOfClass("Humanoid")
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local event = player:FindFirstChild("muscleEvent")
             
-            if character and hum then
-                local punch = LocalPlayer.Backpack:FindFirstChild("Punch") or character:FindFirstChild("Punch")
-                local tool = LocalPlayer.Backpack:FindFirstChild(toolName) or character:FindFirstChild(toolName)
-
-                if punch then
-                    if punch.Parent ~= character then
-                        hum:EquipTool(punch)
-                    end
-                    if punch:FindFirstChild("attackTime") then 
-                        punch.attackTime.Value = 0 
-                    end
-                    punch:Activate()
-                end
+            if char and hum then
+                local tool = player.Backpack:FindFirstChild(toolName) or char:FindFirstChild(toolName)
+                local punch = player.Backpack:FindFirstChild("Punch") or char:FindFirstChild("Punch")
 
                 if tool then
-                    if tool.Parent ~= character then
-                        hum:EquipTool(tool)
-                    end
-                    
-                    local event = LocalPlayer:FindFirstChild("muscleEvent")
+                    if tool.Parent ~= char then tool.Parent = char end
                     if event then 
                         event:FireServer("rep") 
                     end
                     tool:Activate()
                 end
+
+                if punch and event then
+                    event:FireServer("punch")
+                end
             end
             task.wait(0.01)
+        end
+        
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild(toolName) then
+            player.Character[toolName].Parent = player.Backpack
         end
     end)
 end
@@ -620,9 +597,9 @@ toolFolder:AddSwitch("💪 Pushups + 🥊 Punch", function(bool)
     if bool then manageToolCombo("Pushups") end
 end)
 
-toolFolder:AddSwitch("🤸 Handstand + 🥊 Punch", function(bool)
-    _G.HandstandOn = bool
-    if bool then manageToolCombo("Handstand") end
+toolFolder:AddSwitch("🤸 Handstands + 🥊 Punch", function(bool)
+    _G.HandstandsOn = bool
+    if bool then manageToolCombo("Handstands") end
 end)
 
 toolFolder:AddSwitch("🧘 Situps + 🥊 Punch", function(bool)

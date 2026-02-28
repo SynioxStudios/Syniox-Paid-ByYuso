@@ -10,7 +10,7 @@ local rEvents = ReplicatedStorage:WaitForChild("rEvents")
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SynioxStudios/Syn-Paid-Ui/refs/heads/main/SynioxGui.txt", true))()
 local displayName = player.DisplayName
 
-local window = library:AddWindow("Syniox Paid | Muscle Legends || HELLO - ".. displayName, {
+local window = library:AddWindow("Syniox Paid | Muscle Legends || HI - ".. displayName, {
     title_bar = {
         Color3.fromRGB(180, 0, 255),
         Color3.fromRGB(60, 0, 100),
@@ -1076,6 +1076,44 @@ rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
                 task.wait(0.5)
             end
         end)
+    end
+end)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Killer = window:AddTab("Kill V2")
+local playerWhitelist = {}
+
+local whitelistDropdown = Killer:AddDropdown("🫂 Whitelist Player", function(name)
+    playerWhitelist[name] = true
+end)
+
+local function addToWhitelistDropdown(targetPlayer)
+    if targetPlayer ~= LocalPlayer then
+        whitelistDropdown:Add(targetPlayer.Name)
+    end
+end
+
+for _, p in ipairs(Players:GetPlayers()) do
+    addToWhitelistDropdown(p)
+end
+
+Players.PlayerAdded:Connect(function(newPlayer)
+    addToWhitelistDropdown(newPlayer)
+end)
+
+Killer:AddButton("🧹 Clear Whitelist", function()
+    playerWhitelist = {}
+end)
+
+Killer:AddSwitch("🛡️ Auto Whitelist Friends", function(state)
+    _G.WhFriends = state
+    if state then
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and LocalPlayer:IsFriendsWith(p.UserId) then
+                playerWhitelist[p.Name] = true
+            end
+        end
     end
 end)
 

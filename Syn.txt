@@ -1001,7 +1001,7 @@ local selectedUltimate = nil
 local autoBuyActive = false
 local ultimateRemote = game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):WaitForChild("ultimatesRemote")
 
-local upgradeDropdown = rebirths:AddDropdown("📦 Select Ultımate", function(choice)
+local upgradeDropdown = Main:AddDropdown("📦 Select Ultımate", function(choice)
     selectedUltimate = choice
 end)
 

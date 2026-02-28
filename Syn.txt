@@ -283,13 +283,9 @@ end, {placeholder = "Vuruş: 23"})
 
 local function fastRepLoop()
     while runFastRep do
-        if getPing() < 350 then
-            for i = 1, repsPerTick do
-                if not runFastRep then break end
-                muscleEvent:FireServer("rep")
-            end
-        else
-            repeat task.wait(1) until getPing() < 350 or not runFastRep
+        for i = 1, repsPerTick do
+            if not runFastRep then break end
+            muscleEvent:FireServer("rep")
         end
         task.wait(0.01)
     end
@@ -419,7 +415,6 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
             end
         end)
 
-        -- GUI - Minimalist Side Badge
         local ScreenGui = Instance.new("ScreenGui")
         local MainFrame = Instance.new("Frame")
         local UICorner = Instance.new("UICorner")
@@ -430,25 +425,22 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
         ScreenGui.Name = "Str_Premium_AFK"
         ScreenGui.Parent = game:GetService("CoreGui")
 
-        -- Ana Gövde (Minimalist & Dark)
         MainFrame.Name = "MainFrame"
         MainFrame.Parent = ScreenGui
         MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
         MainFrame.BackgroundTransparency = 0.2
         MainFrame.BorderSizePixel = 0
-        MainFrame.Position = UDim2.new(1, 20, 0.5, -50) -- Sağdan giriş için dışarıda
+        MainFrame.Position = UDim2.new(1, 20, 0.5, -50)
         MainFrame.Size = UDim2.new(0, 140, 0, 95)
         
         UICorner.CornerRadius = UDim.new(0, 12)
         UICorner.Parent = MainFrame
 
-        -- İnce şık kenarlık
         UIStroke.Parent = MainFrame
         UIStroke.Thickness = 1.5
-        UIStroke.Color = Color3.fromRGB(40, 40, 40) -- Kırmızı yerine koyu gri (daha premium)
+        UIStroke.Color = Color3.fromRGB(40, 40, 40)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-        -- İçerik Düzeni
         ContentFrame.Parent = MainFrame
         ContentFrame.BackgroundTransparency = 1
         ContentFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -468,22 +460,19 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
             lbl.TextSize = 13
             lbl.Font = Enum.Font.GothamMedium
             lbl.RichText = true
-            lbl.Text = string.format("<font color='rgb(%d,%d,%d)'>%s</font> --", color.R*255, color.G*255, color.B*255, icon)
+            lbl.Text = string.format("<font color='rgb(%d,%d,%d)'>%s</font>", color.R*255, color.G*255, color.B*255, icon)
             lbl.TextXAlignment = Enum.TextXAlignment.Left
             return lbl
         end
 
-        -- İkonlar (Lucide stilinde sade)
         local TimerLabel = CreateRow("🕒", Color3.fromRGB(255, 50, 50))
         local FPSLabel = CreateRow("🚀", Color3.fromRGB(50, 255, 100))
         local MSLabel = CreateRow("📡", Color3.fromRGB(50, 150, 255))
 
-        -- Geliş Animasyonu (Sağdan kayarak oturma)
         TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
             Position = UDim2.new(1, -155, 0.5, -50)
         }):Play()
 
-        -- Update Döngüsü
         local startTime = os.time()
         task.spawn(function()
             while _G.AntiAfkActive do
@@ -498,15 +487,19 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
     else
         _G.AntiAfkActive = false
         if antiAfkConnection then antiAfkConnection:Disconnect() end
+        
         local oldGui = game:GetService("CoreGui"):FindFirstChild("Str_Premium_AFK")
         if oldGui then
             local frame = oldGui:FindFirstChild("MainFrame")
-            TweenService:Create(frame, TweenInfo.new(0.4), {Position = UDim2.new(1, 20, 0.5, -50)}):Play()
-            task.wait(0.4)
+            if frame then
+                game:GetService("TweenService"):Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+                    Position = UDim2.new(1, 20, 0.5, -50)
+                }):Play()
+                task.wait(0.4)
+            end
             oldGui:Destroy()
         end
     end
-end)
 
 local sizeSwitch = StrTab:AddSwitch("Auto Size 2", function(bool)
     _G.autoSizeActive = bool
@@ -522,16 +515,14 @@ end, "Size 2")
 
 local Main = window:AddTab("Main")
 
-Main:AddButton("💎 Gamepass AutoLift", function()
-    local gamepassFolder = game:GetService("ReplicatedStorage").gamepassIds
-    local player = game:GetService("Players").LocalPlayer
-    for _, gamepass in pairs(gamepassFolder:GetChildren()) do
-        local value = Instance.new("IntValue")
-        value.Name = gamepass.Name
-        value.Value = gamepass.Value
-        value.Parent = player.ownedGamepasses
+local repsPerTick = 12
+
+Main:AddTextBox("Rep Speed", function(value)
+    local num = tonumber(value)
+    if num and num > 0 then 
+        repsPerTick = math.floor(num) 
     end
-end, "🔓 Unlock AutoLift Passe")
+end, {placeholder = "Rep Amount (Default: 12)"})
 
 _G.repToggle = false
 Main:AddSwitch("💪 Fast Auto Farm (Equip Any tool)", function(state)
@@ -540,14 +531,15 @@ Main:AddSwitch("💪 Fast Auto Farm (Equip Any tool)", function(state)
         while _G.repToggle do
             local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
             if event then
-                event:FireServer("rep")
+                for i = 1, repsPerTick do
+                    if not _G.repToggle then break end
+                    event:FireServer("rep")
+                end
             end
             task.wait(0.01)
         end
     end)
 end)
-
-local folder1 = Main:AddFolder(" 💪 Tools V2")
 
 local function manageTool(toolName)
     task.spawn(function()
@@ -565,7 +557,10 @@ local function manageTool(toolName)
                     
                     local event = player:FindFirstChild("muscleEvent")
                     if event then
-                        event:FireServer("rep")
+                        for i = 1, repsPerTick do
+                            if not _G[toolName.."On"] then break end
+                            event:FireServer("rep")
+                        end
                     else
                         tool:Activate()
                     end
@@ -585,22 +580,22 @@ local function manageTool(toolName)
     end)
 end
 
-folder1:AddSwitch("🏋️ Weight", function(bool)
+Main:AddSwitch("🏋️ Weight", function(bool)
     _G.WeightOn = bool
     if bool then manageTool("Weight") end
 end)
 
-folder1:AddSwitch("💪 Pushups", function(bool)
+Main:AddSwitch("💪 Pushups", function(bool)
     _G.PushupsOn = bool
     if bool then manageTool("Pushups") end
 end)
 
-folder1:AddSwitch("🤸 Handstands", function(bool)
+Main:AddSwitch("🤸 Handstands", function(bool)
     _G.HandstandsOn = bool
     if bool then manageTool("Handstands") end
 end)
 
-folder1:AddSwitch("🧘 Situps", function(bool)
+Main:AddSwitch("🧘 Situps", function(bool)
     _G.SitupsOn = bool
     if bool then manageTool("Situps") end
 end)
@@ -672,146 +667,6 @@ end)
 TreadmillFolder:AddButton("⛔ Stop Treadmill Farm", function()
     stopTreadmill()
 end)
-
-local VIM = game:GetService("VirtualInputManager")
-local Player = game.Players.LocalPlayer
-local LiftFolder = Main:AddFolder("🏋️‍♂️ Lift Farm")
-
-local function createLiftFarm(name, cf)
-    local active = false
-    LiftFolder:AddSwitch(name, function(bool)
-        active = bool
-        if bool then
-            task.spawn(function()
-                while active do
-                    local char = Player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        if (hrp.Position - cf.Position).Magnitude > 5 then
-                            hrp.CFrame = cf
-                            task.wait(0.3)
-                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            task.wait(0.05)
-                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        end
-                        local event = Player:FindFirstChild("muscleEvent")
-                        if event then event:FireServer("rep") end
-                    end
-                    task.wait(0.01)
-                end
-            end)
-        end
-    end)
-end
-
-createLiftFarm("🌴 Jungle Lift", CFrame.new(-8652.85, 45.22, 2088.99))
-createLiftFarm("👑 Muscle King Lift", CFrame.new(-8774.03, 52.15, -5664.10))
-createLiftFarm("🌟 Legends Lift", CFrame.new(4532.02, 1025.80, -4002.15))
-createLiftFarm("🔮 Mythical Lift", CFrame.new(2486.75, 31.91, 847.89))
-createLiftFarm("❄️ Frost Lift", CFrame.new(-2917.62, 42.60, -211.29))
-
-local BenchFolder = Main:AddFolder("💪 Bench Farm")
-
-local function createBenchFarm(name, cf)
-    local active = false
-    BenchFolder:AddSwitch(name, function(bool)
-        active = bool
-        if bool then
-            task.spawn(function()
-                while active do
-                    local char = Player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        if (hrp.Position - cf.Position).Magnitude > 5 then
-                            hrp.CFrame = cf
-                            task.wait(0.3)
-                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            task.wait(0.05)
-                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        end
-                        local event = Player:FindFirstChild("muscleEvent")
-                        if event then event:FireServer("rep") end
-                    end
-                    task.wait(0.01)
-                end
-            end)
-        end
-    end)
-end
-
-createBenchFarm("🌴 Jungle Bench", CFrame.new(-8173.23, 83.82, 1907.40))
-createBenchFarm("👑 Muscle King Bench", CFrame.new(-8589.43, 58.00, -6044.57))
-createBenchFarm("🌟 Legends Bench", CFrame.new(4109.20, 1035.67, -3802.88))
-createBenchFarm("🔮 Mythical Bench", CFrame.new(2370.74, 57.09, 1243.37))
-createBenchFarm("❄️ Frost Bench", CFrame.new(-3022.97, 41.31, -197.51))
-
-local SquatFolder = Main:AddFolder("🦵 Squat Farm")
-
-local function createSquatFarm(name, cf)
-    local active = false
-    SquatFolder:AddSwitch(name, function(bool)
-        active = bool
-        if bool then
-            task.spawn(function()
-                while active do
-                    local char = Player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        if (hrp.Position - cf.Position).Magnitude > 5 then
-                            hrp.CFrame = cf
-                            task.wait(0.3)
-                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            task.wait(0.05)
-                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        end
-                        local event = Player:FindFirstChild("muscleEvent")
-                        if event then event:FireServer("rep") end
-                    end
-                    task.wait(0.01)
-                end
-            end)
-        end
-    end)
-end
-
-createSquatFarm("🌴 Jungle Squat", CFrame.new(-8377.55, 48.71, 2864.90))
-createSquatFarm("👑 Muscle King Squat", CFrame.new(-8759.62, 46.50, -6041.16))
-createSquatFarm("🌟 Legends Squat", CFrame.new(4438.74, 1021.38, -4058.46))
-createSquatFarm("❄️ Frost Squat", CFrame.new(-2720.66, 27.85, -590.72))
-
-local BoulderFolder = Main:AddFolder("🗿 Boulder Farm")
-
-local function createBoulderFarm(name, cf)
-    local active = false
-    BoulderFolder:AddSwitch(name, function(bool)
-        active = bool
-        if bool then
-            task.spawn(function()
-                while active do
-                    local char = Player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        if (hrp.Position - cf.Position).Magnitude > 5 then
-                            hrp.CFrame = cf
-                            task.wait(0.3)
-                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            task.wait(0.05)
-                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        end
-                        local event = Player:FindFirstChild("muscleEvent")
-                        if event then event:FireServer("rep") end
-                    end
-                    task.wait(0.01)
-                end
-            end)
-        end
-    end)
-end
-
-createBoulderFarm("🌴 Jungle Boulder", CFrame.new(-8614.81, 51.90, 2677.37))
-createBoulderFarm("👑 Muscle King Boulder", CFrame.new(-8942.97, 60.71, -5692.74))
-createBoulderFarm("🌟 Legends Boulder", CFrame.new(4188.75, 1019.85, -3905.19))
-createBoulderFarm("🔮 Mythical Boulder", CFrame.new(2667.31, 58.88, 1202.46))
 
 local toolFolder = Main:AddFolder(" 💨 OP Tools V2")
 
@@ -1106,6 +961,17 @@ RockFolder:AddSwitch("🌴 Jungle Rock 10M", function(Value)
     end)
 end)
 
+Main:AddButton("💎 Gamepass AutoLift", function()
+    local gamepassFolder = game:GetService("ReplicatedStorage").gamepassIds
+    local player = game:GetService("Players").LocalPlayer
+    for _, gamepass in pairs(gamepassFolder:GetChildren()) do
+        local value = Instance.new("IntValue")
+        value.Name = gamepass.Name
+        value.Value = gamepass.Value
+        value.Parent = player.ownedGamepasses
+    end
+end, "🔓 Unlock AutoLift Passe")
+
 Main:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
     autoEatEnabled = state
     if state then
@@ -1309,6 +1175,43 @@ rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
                 task.wait(0.5)
             end
         end)
+    end
+end)
+
+local Killer = window:AddTab("Kill V2")
+
+local playerWhitelist = {}
+
+local whitelistDropdown = Killer:AddDropdown("🫂 Whitelist Player", function(name)
+    if name then
+        playerWhitelist[name] = true
+    end
+end)
+
+local function addToWhitelistDropdown(player)
+    if player ~= LocalPlayer then
+        whitelistDropdown:Add(player.Name)
+    end
+end
+
+for _, p in ipairs(Players:GetPlayers()) do
+    addToWhitelistDropdown(p)
+end
+
+Players.PlayerAdded:Connect(addToWhitelistDropdown)
+
+Killer:AddButton("🧹 Clear Whitelist", function()
+    playerWhitelist = {}
+end)
+
+Killer:AddSwitch("🛡️ Auto Whitelist Friends", function(state)
+    _G.WhFriends = state
+    if state then
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and LocalPlayer:IsFriendsWith(p.UserId) then
+                playerWhitelist[p.Name] = true
+            end
+        end
     end
 end)
 

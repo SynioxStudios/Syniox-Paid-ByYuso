@@ -283,9 +283,13 @@ end, {placeholder = "Vuruş: 23"})
 
 local function fastRepLoop()
     while runFastRep do
-        for i = 1, repsPerTick do
-            if not runFastRep then break end
-            muscleEvent:FireServer("rep")
+        if getPing() < 350 then
+            for i = 1, repsPerTick do
+                if not runFastRep then break end
+                muscleEvent:FireServer("rep")
+            end
+        else
+            repeat task.wait(1) until getPing() < 350 or not runFastRep
         end
         task.wait(0.01)
     end

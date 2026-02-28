@@ -888,9 +888,10 @@ Main:AddSwitch("🥚 Auto Eat Egg (60 Min)", function(state)
     end
 end)
 
-local rebirths = window:AddTab("Rebirths")
+Main:AddLabel("--------------------")
+Main:AddLabel("--- Rebirth ---")
 
-rebirths:AddTextBox("🔢 Rebirth Target", function(text)
+Main:AddTextBox("🔢 Rebirth Target", function(text)
     local newValue = tonumber(text)
     if newValue and newValue > 0 then
         targetRebirthValue = newValue
@@ -912,7 +913,7 @@ end)
 
 local infiniteSwitch
 
-local targetSwitch = rebirths:AddSwitch("🔄 Auto Rebirth Target", function(bool)
+local targetSwitch = Main:AddSwitch("🔄 Auto Rebirth Target", function(bool)
     _G.targetRebirthActive = bool
     
     if bool then
@@ -944,7 +945,7 @@ local targetSwitch = rebirths:AddSwitch("🔄 Auto Rebirth Target", function(boo
     end
 end, "automatic rebirth until reaching the goal")
 
-infiniteSwitch = rebirths:AddSwitch("♾️ Auto Rebirth (Infinitely)", function(bool)
+infiniteSwitch = Main:AddSwitch("♾️ Auto Rebirth (Infinitely)", function(bool)
     _G.infiniteRebirthActive = bool
     
     if bool then
@@ -961,7 +962,7 @@ infiniteSwitch = rebirths:AddSwitch("♾️ Auto Rebirth (Infinitely)", function
     end
 end, "rebirth infinitely")
 
-local sizeSwitch = rebirths:AddSwitch("📏 Auto Size 2", function(bool)
+local sizeSwitch = Main:AddSwitch("📏 Auto Size 2", function(bool)
     _G.autoSizeActive = bool
     
     if bool then
@@ -973,7 +974,7 @@ local sizeSwitch = rebirths:AddSwitch("📏 Auto Size 2", function(bool)
     end
 end, "Size 2")
 
-local teleportSwitch = rebirths:AddSwitch("👑 Auto TP Muscle King", function(bool)
+local teleportSwitch = Main:AddSwitch("👑 Auto TP Muscle King", function(bool)
     _G.teleportActive = bool
     
     if bool then
@@ -987,39 +988,7 @@ local teleportSwitch = rebirths:AddSwitch("👑 Auto TP Muscle King", function(b
     end
 end, "Tp to Mk")
 
-rebirths:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
-    autoEatEnabled = state
-    if state then
-        task.spawn(function()
-            while autoEatEnabled do
-                local egg = player.Backpack:FindFirstChild("Protein Egg")
-                if egg then
-                    egg.Parent = player.Character
-                    pcall(function() egg:Activate() end)
-                end
-                task.wait(1800)
-            end
-        end)
-    end
-end)
-
-rebirths:AddSwitch("🥚 Auto Eat Egg (60 Min)", function(state)
-    autoEatEnabled = state
-    if state then
-        task.spawn(function()
-            while autoEatEnabled do
-                local egg = player.Backpack:FindFirstChild("Protein Egg")
-                if egg then
-                    egg.Parent = player.Character
-                    pcall(function() egg:Activate() end)
-                end
-                task.wait(3600)
-            end
-        end)
-    end
-end)
-
-rebirths:AddSwitch("👁️‍🗨️ Hide All Frames", function(bool)
+Main:AddSwitch("👁️‍🗨️ Hide All Frames", function(bool)
     local rSto = game:GetService("ReplicatedStorage")
     for _, obj in pairs(rSto:GetChildren()) do
         if obj.Name:match("Frame$") then
@@ -1046,7 +1015,7 @@ for _, itemName in ipairs(items) do
     upgradeDropdown:Add(itemName)
 end
 
-rebirths:AddSwitch("🔄 Auto Buy Selected", function(state)
+Main:AddSwitch("🔄 Auto Buy Selected", function(state)
     autoBuyActive = state
     if autoBuyActive then
         task.spawn(function()

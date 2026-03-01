@@ -1722,7 +1722,7 @@ local PlayerDrop = StatsFolder:AddDropdown("Select Player", function(Value)
 end)
 
 for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-    PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
+    PlayerDrop:Add(Plr.DisplayName .. " | " Plr.Name)
 end
 
 game:GetService("Players").PlayerAdded:Connect(function(Plr)
@@ -1745,16 +1745,54 @@ local function FormatAbbreviated(number)
 end
 
 local function FormatDisplay(value)
-    local normal = FormatNumberWithCommas(value)
+
+local LookDura = window:AddTab("Stats")
+local SelectPlayerName = ""
+
+local StatsFolder = LookDura:AddFolder(" 👤 Stats V2")
+
+local PlayerDrop = StatsFolder:AddDropdown("Select Player", function(Value)
+    SelectPlayerName = Value:match("| (.+)")
+end)
+
+for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
+    PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
+end
+
+game:GetService("Players").PlayerAdded:Connect(function(Plr)
+    PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
+end)
+
+local function FormatNumberWithCommas(number)
+    local formatted = tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse()
+    return formatted:gsub("^,", "")
+end
+
+local function FormatAbbreviated(number)
+    local abbreviations = {"", "K", "M", "B", "T", "Qa", "Qi"}
+    local abbreviationIndex = 1
+    if number < 1000 then return tostring(math.floor(number)) end
+    while number >= 1000 and abbreviationIndex < #abbreviations do
+        number = number / 1000
+        abbreviationIndex = abbreviationIndex + 1
+    end
+    return string.format("%.2f", number) .. abbreviations[abbreviationIndex]
+end
+
+local function FormatDisplay(value)
+    local normal = FormatNumberWithCommas(math.floor(value))
     local abbreviated = FormatAbbreviated(value)
     return "[ " .. normal .. " | " .. abbreviated .. " ]"
 end
 
+-- Etiketler
 local Update = StatsFolder:AddLabel("💪 Strength: -")
 local Update1 = StatsFolder:AddLabel("💎 Gems: -")
 local Update2 = StatsFolder:AddLabel("🔄 Rebirths: -")
 local Update3 = StatsFolder:AddLabel("⚡ Agility: -")
 local Update4 = StatsFolder:AddLabel("🛡️ Durability: -")
+local Update12 = StatsFolder:AddLabel("😈 Evil Karma: -")
+local Update13 = StatsFolder:AddLabel("✨ Good Karma: -")
 local Update5 = StatsFolder:AddLabel("💀 Kills: -")
 local Update9 = StatsFolder:AddLabel("📍 Current Map: -")
 
@@ -1762,12 +1800,6 @@ StatsFolder:AddLabel("------------------------------")
 local EnemyHealthLabel = StatsFolder:AddLabel("Target Health: 0 / 0")
 local MyDamageLabel = StatsFolder:AddLabel("Your Damage: 0")
 local FinalHTKLabel = StatsFolder:AddLabel("Hits To Kill: 0")
-StatsFolder:AddLabel("------------------------------")
-StatsFolder:AddLabel("🐾 Equipped Pets:")
-local PetLabels = {}
-for i = 1, 8 do
-    PetLabels[i] = StatsFolder:AddLabel(i .. ". Empty")
-end
 StatsFolder:AddLabel("------------------------------")
 
 task.spawn(function()
@@ -1777,46 +1809,36 @@ task.spawn(function()
             local localPlayer = game.Players.LocalPlayer
             
             if player and player.Parent and localPlayer then
+                -- Karma ve Diğer İstatistikler
                 if player:FindFirstChild("Gems") then Update1.Text = "💎 Gems: " .. FormatDisplay(player.Gems.Value) end
                 if player:FindFirstChild("Agility") then Update3.Text = "⚡ Agility: " .. FormatDisplay(player.Agility.Value) end
                 if player:FindFirstChild("Durability") then Update4.Text = "🛡️ Durability: " .. FormatDisplay(player.Durability.Value) end
-                if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Kills") then Update5.Text = "💀 Kills: " .. FormatDisplay(player.leaderstats.Kills.Value) end
-                if player:FindFirstChild("currentMap") then Update9.Text = "📍 Current Map: " .. tostring(player.currentMap.Value) end
+                if player:FindFirstChild("evilKarma") then Update12.Text = "😈 Evil Karma: " .. FormatDisplay(player.evilKarma.Value) end
+                if player:FindFirstChild("goodKarma") then Update13.Text = "✨ Good Karma: " .. FormatDisplay(player.goodKarma.Value) end
                 
                 local leaderstats = player:FindFirstChild("leaderstats")
                 if leaderstats then
                     if leaderstats:FindFirstChild("Strength") then Update.Text = "💪 Strength: " .. FormatDisplay(leaderstats.Strength.Value) end
                     if leaderstats:FindFirstChild("Rebirths") then Update2.Text = "🔄 Rebirths: " .. FormatDisplay(leaderstats.Rebirths.Value) end
+                    if leaderstats:FindFirstChild("Kills") then Update5.Text = "💀 Kills: " .. FormatDisplay(leaderstats.Kills.Value) end
                 end
 
-                local equippedPets = {}
-                local petFolder = player:FindFirstChild("petFolder")
-                if petFolder then
-                    for _, folder in pairs(petFolder:GetChildren()) do
-                        for _, pet in pairs(folder:GetChildren()) do
-                            if pet:FindFirstChild("equipped") and pet.equipped.Value == true then
-                                table.insert(equippedPets, pet.Name)
-                            end
-                        end
-                    end
-                end
+                if player:FindFirstChild("currentMap") then Update9.Text = "📍 Current Map: " .. tostring(player.currentMap.Value) end
 
-                for i = 1, 8 do
-                    if equippedPets[i] then
-                        PetLabels[i].Text = i .. ". 🐾 " .. equippedPets[i]
-                    else
-                        PetLabels[i].Text = i .. ". Empty"
-                    end
-                end
-
+                -- HTK ve Hasar Hesaplaması (Düzeltildi)
                 local char = player.Character
                 local myStr = (localPlayer:FindFirstChild("leaderstats") and localPlayer.leaderstats:FindFirstChild("Strength") and localPlayer.leaderstats.Strength.Value) or 1
+                local tarDur = (player:FindFirstChild("Durability") and player.Durability.Value) or 1
+                
                 if char and char:FindFirstChild("Humanoid") then
                     local currentHP = math.floor(char.Humanoid.Health)
                     local maxHP = math.floor(char.Humanoid.MaxHealth)
+                    
                     EnemyHealthLabel.Text = "Target Health: [ " .. FormatNumberWithCommas(currentHP) .. " / " .. FormatNumberWithCommas(maxHP) .. " ]"
                     MyDamageLabel.Text = "Your Damage: " .. FormatAbbreviated(myStr)
-                    local htkCalc = math.ceil(currentHP / myStr)
+                    
+                    -- HTK Hesaplaması: Durability / Strength mantığı
+                    local htkCalc = math.ceil(tarDur / myStr)
                     if currentHP <= 0 then
                         FinalHTKLabel.Text = "Hits To Kill: DEAD"
                     else
@@ -2381,3 +2403,160 @@ task.spawn(function()
     end
 end)
 
+local teleport = window:AddTab("Teleport")
+
+teleport:AddButton("📍Spawn", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(2, 8, 115)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Spawn",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Secret Area", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(1947, 2, 6191)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Secret Area",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Tiny Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-34, 7, 1903)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Tiny Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Frozen Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(- 2600.00244, 3.67686558, - 403.884369, 0.0873617008, 1.0482899e-09, 0.99617666, 3.07204253e-08, 1, - 3.7464023e-09, - 0.99617666, 3.09302628e-08, 0.0873617008)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Frozen Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Mythical Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(2255, 7, 1071)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Mythical Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Hell Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-6768, 7, -1287)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Hell Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Legend Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(4604, 991, -3887)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Legend Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Muscle King Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-8646, 17, -5738)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Muscle King",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Jungle Island", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-8659, 6, 2384)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Jungle Island",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Brawl Lava", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(4471, 119, -8836)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Brawl Lava",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Brawl Desert", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(960, 17, -7398)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Brawl Desert",
+        Duration = 0
+    })
+end)
+
+teleport:AddButton("📍Brawl Regular", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-1849, 20, -6335)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teleport",
+        Text = "Teleported to Brawl Regular",
+        Duration = 0
+    })
+end)

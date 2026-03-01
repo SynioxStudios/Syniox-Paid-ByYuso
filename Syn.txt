@@ -418,6 +418,8 @@ end, "Size 2")
 local Main = window:AddTab("Main")
 local repsPerTick = 1
 
+Main:AddLabel("🔥 Op Main")
+
 Main:AddTextBox("🚀 Thread Speed", function(value)
     local num = tonumber(value)
     if num and num > 0 then 

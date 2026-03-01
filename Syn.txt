@@ -1722,40 +1722,6 @@ local PlayerDrop = StatsFolder:AddDropdown("Select Player", function(Value)
 end)
 
 for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-    PlayerDrop:Add(Plr.DisplayName .. " | " Plr.Name)
-end
-
-game:GetService("Players").PlayerAdded:Connect(function(Plr)
-    PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
-end)
-
-local function FormatNumberWithCommas(number)
-    local formatted = tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse()
-    return formatted:gsub("^,", "")
-end
-
-local function FormatAbbreviated(number)
-    local abbreviations = {"", "K", "M", "B", "T", "Qa", "Qi"}
-    local abbreviationIndex = 1
-    while number >= 1000 and abbreviationIndex < #abbreviations do
-        number = number / 1000
-        abbreviationIndex = abbreviationIndex + 1
-    end
-    return string.format("%.2f", number) .. abbreviations[abbreviationIndex]
-end
-
-local function FormatDisplay(value)
-
-local LookDura = window:AddTab("Stats")
-local SelectPlayerName = ""
-
-local StatsFolder = LookDura:AddFolder(" 👤 Stats V2")
-
-local PlayerDrop = StatsFolder:AddDropdown("Select Player", function(Value)
-    SelectPlayerName = Value:match("| (.+)")
-end)
-
-for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
     PlayerDrop:Add(Plr.DisplayName .. " | " .. Plr.Name)
 end
 
@@ -1785,7 +1751,6 @@ local function FormatDisplay(value)
     return "[ " .. normal .. " | " .. abbreviated .. " ]"
 end
 
--- Etiketler
 local Update = StatsFolder:AddLabel("💪 Strength: -")
 local Update1 = StatsFolder:AddLabel("💎 Gems: -")
 local Update2 = StatsFolder:AddLabel("🔄 Rebirths: -")

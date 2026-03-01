@@ -1031,10 +1031,10 @@ Main:AddSwitch("🔄 Auto Buy Selected", function(state)
     end
 end)
 
-AutoFarm:AddLabel("----------------------------")
-AutoFarm:AddLabel("👊 Auto Brawl")
+Main:AddLabel("----------------------------")
+Main:AddLabel("👊 Auto Brawl")
 
-AutoFarm:AddSwitch("🏆 Auto Join Brawl", function(state)
+Main:AddSwitch("🏆 Auto Join Brawl", function(state)
     autoBrawl = state
     task.spawn(function()
         while autoBrawl do
@@ -1044,7 +1044,7 @@ AutoFarm:AddSwitch("🏆 Auto Join Brawl", function(state)
     end)
 end)
 
-AutoFarm:AddSwitch("🛡️ God Mode", function(state)
+Main:AddSwitch("🛡️ God Mode", function(state)
     godModeToggle = state
     manageParts(state)
     if state then
@@ -1057,7 +1057,7 @@ AutoFarm:AddSwitch("🛡️ God Mode", function(state)
     end
 end)
 
-AutoFarm:AddSwitch("⚔️ Auto Win Brawl", function(state)
+Main:AddSwitch("⚔️ Auto Win Brawl", function(state)
     autoWinBrawl = state
     if state then
         task.spawn(function()

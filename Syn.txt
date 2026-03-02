@@ -403,7 +403,7 @@ StrTab:AddSwitch("👁️‍🗨️ Hide All Frames", function(state)
     end
 end)
 
-StrTab:AddSwitch("⏳ Anti Afk", function(Value)
+StrTab:AddSwitch("⏳ Anti-Afk", function(Value)
     if Value then
         _G.AntiAfkActive = true
         _G.AntiAfkLoopActive = true
@@ -432,6 +432,8 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
         ScreenGui.Name = "Str_Premium_AFK"
         ScreenGui.Parent = playerGui
         ScreenGui.ResetOnSpawn = false
+        ScreenGui.DisplayOrder = 5
+        ScreenGui.IgnoreGuiInset = true
 
         MainFrame.Name = "MainFrame"
         MainFrame.Parent = ScreenGui
@@ -440,6 +442,8 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
         MainFrame.BorderSizePixel = 0
         MainFrame.Position = UDim2.new(1, 20, 0.5, -50)
         MainFrame.Size = UDim2.new(0, 140, 0, 95)
+        MainFrame.Active = true
+        MainFrame.Draggable = true
         
         UICorner.CornerRadius = UDim.new(0, 12)
         UICorner.Parent = MainFrame
@@ -452,6 +456,7 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
         ContentFrame.Parent = MainFrame
         ContentFrame.BackgroundTransparency = 1
         ContentFrame.Size = UDim2.new(1, 0, 1, 0)
+        ContentFrame.Active = false
         
         UIListLayout.Parent = ContentFrame
         UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -497,6 +502,8 @@ StrTab:AddSwitch("⏳ Anti Afk", function(Value)
                 local pingStat = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")
                 local ping = pingStat and math.floor(pingStat:GetValue()) or 0
                 MSLabel.Text = string.format("<font color='rgb(50,150,255)'>📡</font> %d MS", ping)
+                
+                task.wait(0.4)
             end
         end)
 

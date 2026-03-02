@@ -1729,10 +1729,8 @@ end
 for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
 
-local GymTab = window:AddTab("Gyim")
+local GymTab = window:AddTab("Gym")
 local VIM = game:GetService("VirtualInputManager")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
 
 local function pressEKey()
     VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
@@ -1742,48 +1740,45 @@ end
 
 local function createMovementUI(moveName, gymLocations)
     local selectedGym = "Jungle Gym"
+    local repsPerTick = 1
     local active = false
     
     GymTab:AddLabel("🏋️ " .. moveName)
 
+    -- Syniox Dropdown: Name, DefaultValue, OptionsList, Callback
     GymTab:AddDropdown("📍 Select Location", "Jungle Gym", {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym", "Frost Gym"}, function(value)
         selectedGym = value
     end)
+
+    -- Her hareket için özel hız ayarı
+    GymTab:AddTextBox("🚀 Speed (Amount)", function(value)
+        local num = tonumber(value)
+        repsPerTick = (num and num > 0) and math.floor(num) or 1
+    end, {placeholder = "1"})
 
     GymTab:AddSwitch("Auto " .. moveName, function(bool)
         active = bool
         task.spawn(function()
             while active do
-                -- Güvenlik kontrolleri
-                local character = player.Character
-                if not character then 
-                    task.wait(1)
-                    goto continue
-                end
-                
-                local root = character:FindFirstChild("HumanoidRootPart")
-                if not root then
-                    task.wait(1)
-                    goto continue
-                end
-                
                 local data = gymLocations[selectedGym]
-                if data and data.Position.Magnitude > 0.1 then
-                    local distance = (root.Position - data.Position).Magnitude
-                    
-                    if distance > 5 then
+                local char = game.Players.LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if root and data and data ~= CFrame.new(0,0,0) then
+                    if (root.Position - data.p).Magnitude > 5 then
                         root.CFrame = data
                         task.wait(0.3)
                         pressEKey()
                     end
                     
-                    local event = player:FindFirstChild("muscleEvent")
+                    local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
                     if event then
-                        event:FireServer("rep")
+                        for i = 1, repsPerTick do
+                            if not active then break end
+                            event:FireServer("rep")
+                        end
                     end
                 end
-                
-                ::continue::
                 task.wait(0.05)
             end
         end)

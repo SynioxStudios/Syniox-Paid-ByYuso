@@ -1738,77 +1738,163 @@ local function pressEKey()
     VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
 
-local function createMovementUI(moveName, gymLocations)
-    local selectedGym = ""
-    local active = false
-    
-    GymTab:AddLabel("🏋️ " .. moveName)
-    
-    GymTab:AddDropdown("📍 Select Location", function(value)
-        selectedGym = value
-    end, {options = (function()
-        local keys = {}
-        for k in pairs(gymLocations) do table.insert(keys, k) end
-        return keys
-    end)()})
+-- 1. Dumbbell Lift
+local selectedDumbbell = "Jungle Gym"
+GymTab:AddLabel("🏋️ Dumbbell Lift")
+GymTab:AddDropdown("📍 Select Location", function(value)
+    selectedDumbbell = value
+end, {
+    options = {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym", "Frost Gym"},
+    default = "Jungle Gym"
+})
 
-    GymTab:AddSwitch("Auto " .. moveName, function(bool)
-        active = bool
-        if bool then
-            task.spawn(function()
-                while active do
-                    local data = gymLocations[selectedGym]
-                    local char = game.Players.LocalPlayer.Character
-                    local root = char and char:FindFirstChild("HumanoidRootPart")
-                    
-                    if root and data and selectedGym ~= "" then
-                        if (root.Position - data.p).Magnitude > 5 then
-                            root.CFrame = data
-                            task.wait(0.3)
-                            pressEKey()
-                        end
-                        
-                        local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
-                        if event then
-                            event:FireServer("rep")
-                        end
-                    end
-                    task.wait(0.05)
-                end
-            end)
-        end
-    end)
-end
-
-createMovementUI("Dumbbell Lift", {
+local dbCf = {
     ["Jungle Gym"] = CFrame.new(-8652.85, 45.22, 2088.99),
     ["Muscle King"] = CFrame.new(-8774.03, 52.15, -5664.10),
     ["Legends Gym"] = CFrame.new(4532.02, 1025.80, -4002.15),
     ["Mythical Gym"] = CFrame.new(2486.75, 31.91, 847.89),
     ["Frost Gym"] = CFrame.new(-2917.62, 42.60, -211.29)
+}
+
+local dbActive = false
+GymTab:AddSwitch("Auto Dumbbell Lift", function(bool)
+    dbActive = bool
+    task.spawn(function()
+        while dbActive do
+            local cf = dbCf[selectedDumbbell]
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local root = char.HumanoidRootPart
+                if (root.Position - cf.p).Magnitude > 5 then
+                    root.CFrame = cf
+                    task.wait(0.3)
+                    pressEKey()
+                end
+                local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                if event then event:FireServer("rep") end
+            end
+            task.wait(0.01)
+        end
+    end)
+end)
+
+-- 2. Bench Press
+local selectedBench = "Jungle Gym"
+GymTab:AddLabel("🏋️ Bench Press")
+GymTab:AddDropdown("📍 Select Location", function(value)
+    selectedBench = value
+end, {
+    options = {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym", "Frost Gym"},
+    default = "Jungle Gym"
 })
 
-createMovementUI("Bench Press", {
+local bpCf = {
     ["Jungle Gym"] = CFrame.new(-8173.23, 83.82, 1907.40),
     ["Muscle King"] = CFrame.new(-8589.43, 58.00, -6044.57),
     ["Legends Gym"] = CFrame.new(4109.20, 1035.67, -3802.88),
     ["Mythical Gym"] = CFrame.new(2370.74, 57.09, 1243.37),
     ["Frost Gym"] = CFrame.new(-3022.97, 41.31, -197.51)
+}
+
+local bpActive = false
+GymTab:AddSwitch("Auto Bench Press", function(bool)
+    bpActive = bool
+    task.spawn(function()
+        while bpActive do
+            local cf = bpCf[selectedBench]
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local root = char.HumanoidRootPart
+                if (root.Position - cf.p).Magnitude > 5 then
+                    root.CFrame = cf
+                    task.wait(0.3)
+                    pressEKey()
+                end
+                local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                if event then event:FireServer("rep") end
+            end
+            task.wait(0.05)
+        end
+    end)
+end)
+
+-- 3. Squat
+local selectedSquat = "Jungle Gym"
+GymTab:AddLabel("🏋️ Squat")
+GymTab:AddDropdown("📍 Select Location", function(value)
+    selectedSquat = value
+end, {
+    options = {"Jungle Gym", "Muscle King", "Legends Gym", "Frost Gym"},
+    default = "Jungle Gym"
 })
 
-createMovementUI("Squat", {
+local sqCf = {
     ["Jungle Gym"] = CFrame.new(-8377.55, 48.71, 2864.90),
     ["Muscle King"] = CFrame.new(-8759.62, 46.50, -6041.16),
     ["Legends Gym"] = CFrame.new(4438.74, 1021.38, -4058.46),
     ["Frost Gym"] = CFrame.new(-2720.66, 27.85, -590.72)
+}
+
+local sqActive = false
+GymTab:AddSwitch("Auto Squat", function(bool)
+    sqActive = bool
+    task.spawn(function()
+        while sqActive do
+            local cf = sqCf[selectedSquat]
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local root = char.HumanoidRootPart
+                if (root.Position - cf.p).Magnitude > 5 then
+                    root.CFrame = cf
+                    task.wait(0.3)
+                    pressEKey()
+                end
+                local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                if event then event:FireServer("rep") end
+            end
+            task.wait(0.01)
+        end
+    end)
+end)
+
+-- 4. Boulder
+local selectedBoulder = "Jungle Gym"
+GymTab:AddLabel("🏋️ Boulder")
+GymTab:AddDropdown("📍 Select Location", function(value)
+    selectedBoulder = value
+end, {
+    options = {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym"},
+    default = "Jungle Gym"
 })
 
-createMovementUI("Boulder", {
+local bldCf = {
     ["Jungle Gym"] = CFrame.new(-8614.81, 51.90, 2677.37),
     ["Muscle King"] = CFrame.new(-8942.97, 60.71, -5692.74),
     ["Legends Gym"] = CFrame.new(4188.75, 1019.85, -3905.19),
     ["Mythical Gym"] = CFrame.new(2667.31, 58.88, 1202.46)
-})
+}
+
+local bldActive = false
+GymTab:AddSwitch("Auto Boulder", function(bool)
+    bldActive = bool
+    task.spawn(function()
+        while bldActive do
+            local cf = bldCf[selectedBoulder]
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local root = char.HumanoidRootPart
+                if (root.Position - cf.p).Magnitude > 5 then
+                    root.CFrame = cf
+                    task.wait(0.3)
+                    pressEKey()
+                end
+                local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                if event then event:FireServer("rep") end
+            end
+            task.wait(0.01)
+        end
+    end)
+end)
 
 local LookDura = window:AddTab("Stats")
 local SelectPlayerName = ""

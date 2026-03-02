@@ -864,6 +864,88 @@ RockFolder:AddSwitch("🌴 Jungle Rock 10M", function(Value)
     end)
 end)
 
+local lp = game:GetService("Players").LocalPlayer
+
+local function gettool()
+    for i, v in pairs(lp.Backpack:GetChildren()) do
+        if v.Name == "Punch" and lp.Character:FindFirstChild("Humanoid") then
+            lp.Character.Humanoid:EquipTool(v)
+        end
+    end
+    local event = lp:FindFirstChild("muscleEvent")
+    if event then
+        event:FireServer("punch", "leftHand")
+        event:FireServer("punch", "rightHand")
+    end
+end
+
+local rockData = {
+    ["Tiny Rock (0)"] = {dur = 0, pos = Vector3.new(18.27, 5.23, 2093.81)},
+    ["Starter Rock (100)"] = {dur = 100, pos = Vector3.new(182.07, 5.03, -151.99)},
+    ["Golden Rock (5K)"] = {dur = 5000, pos = Vector3.new(342.33, 5.12, -590.91)},
+    ["Frost Rock (150K)"] = {dur = 150000, pos = Vector3.new(-2590.58, 5.03, -241.71)},
+    ["Mythical Rock (400K)"] = {dur = 400000, pos = Vector3.new(2224.73, 5.03, 1251.95)},
+    ["Eternal Rock (750K)"] = {dur = 750000, pos = Vector3.new(-7223.26, 5.07, -1259.91)},
+    ["Legend Rock (1M)"] = {dur = 1000000, pos = Vector3.new(4141.13, 989.23, -4029.81)},
+    ["Muscle King Rock (5M)"] = {dur = 5000000, pos = Vector3.new(-9040.84, 6.9, -6057.31)},
+    ["Jungle Rock (10M)"] = {dur = 10000000, pos = Vector3.new(-7706.23, 4.51, 2918.94)}
+}
+
+local selectedRock = "Tiny Rock (0)"
+local rockActive = false
+
+Main:AddLabel("👊 Rock Farm")
+
+local RockDrop = Main:AddDropdown("📍 Select Rock", function(text)
+    selectedRock = text
+end)
+
+RockDrop:Add("Tiny Rock (0)")
+RockDrop:Add("Starter Rock (100)")
+RockDrop:Add("Golden Rock (5K)")
+RockDrop:Add("Frost Rock (150K)")
+RockDrop:Add("Mythical Rock (400K)")
+RockDrop:Add("Eternal Rock (750K)")
+RockDrop:Add("Legend Rock (1M)")
+RockDrop:Add("Muscle King Rock (5M)")
+RockDrop:Add("Jungle Rock (10M)")
+
+Main:AddSwitch("Auto Rock Farm", function(state)
+    rockActive = state
+    if state then
+        spawn(function()
+            while rockActive do
+                task.wait(0.01)
+                local data = rockData[selectedRock]
+                local char = lp.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if data and root and lp.Durability.Value >= data.dur then
+                    if (root.Position - data.pos).Magnitude > 10 then
+                        root.CFrame = CFrame.new(data.pos)
+                        task.wait(0.3)
+                    end
+
+                    for _, v in pairs(workspace.machinesFolder:GetDescendants()) do
+                        if v.Name == "neededDurability" and v.Value == data.dur then
+                            local rockPart = v.Parent:FindFirstChild("Rock")
+                            if rockPart and char:FindFirstChild("LeftHand") and char:FindFirstChild("RightHand") then
+                                for _ = 1, 3 do
+                                    firetouchinterest(rockPart, char.RightHand, 0)
+                                    firetouchinterest(rockPart, char.RightHand, 1)
+                                    firetouchinterest(rockPart, char.LeftHand, 0)
+                                    firetouchinterest(rockPart, char.LeftHand, 1)
+                                end
+                                gettool()
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
 Main:AddButton("💎 Gamepass AutoLift", function()
     local gamepassFolder = game:GetService("ReplicatedStorage").gamepassIds
     local player = game:GetService("Players").LocalPlayer

@@ -1729,6 +1729,87 @@ end
 for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
 
+local GymTab = window:AddTab("Gym")
+local VIM = game:GetService("VirtualInputManager")
+
+local function pressEKey()
+    VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(0.05)
+    VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+local function createMovementUI(moveName, gymLocations)
+    local selectedGym = ""
+    local active = false
+    
+    GymTab:AddLabel("🏋️ " .. moveName)
+    
+    GymTab:AddDropdown("📍 Select Location", function(value)
+        selectedGym = value
+    end, {options = (function()
+        local keys = {}
+        for k in pairs(gymLocations) do table.insert(keys, k) end
+        return keys
+    end)()})
+
+    GymTab:AddSwitch("Auto " .. moveName, function(bool)
+        active = bool
+        if bool then
+            task.spawn(function()
+                while active do
+                    local data = gymLocations[selectedGym]
+                    local char = game.Players.LocalPlayer.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    
+                    if root and data and selectedGym ~= "" then
+                        if (root.Position - data.p).Magnitude > 5 then
+                            root.CFrame = data
+                            task.wait(0.3)
+                            pressEKey()
+                        end
+                        
+                        local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                        if event then
+                            event:FireServer("rep")
+                        end
+                    end
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end)
+end
+
+createMovementUI("Dumbbell Lift", {
+    ["Jungle Gym"] = CFrame.new(-8652.85, 45.22, 2088.99),
+    ["Muscle King"] = CFrame.new(-8774.03, 52.15, -5664.10),
+    ["Legends Gym"] = CFrame.new(4532.02, 1025.80, -4002.15),
+    ["Mythical Gym"] = CFrame.new(2486.75, 31.91, 847.89),
+    ["Frost Gym"] = CFrame.new(-2917.62, 42.60, -211.29)
+})
+
+createMovementUI("Bench Press", {
+    ["Jungle Gym"] = CFrame.new(-8173.23, 83.82, 1907.40),
+    ["Muscle King"] = CFrame.new(-8589.43, 58.00, -6044.57),
+    ["Legends Gym"] = CFrame.new(4109.20, 1035.67, -3802.88),
+    ["Mythical Gym"] = CFrame.new(2370.74, 57.09, 1243.37),
+    ["Frost Gym"] = CFrame.new(-3022.97, 41.31, -197.51)
+})
+
+createMovementUI("Squat", {
+    ["Jungle Gym"] = CFrame.new(-8377.55, 48.71, 2864.90),
+    ["Muscle King"] = CFrame.new(-8759.62, 46.50, -6041.16),
+    ["Legends Gym"] = CFrame.new(4438.74, 1021.38, -4058.46),
+    ["Frost Gym"] = CFrame.new(-2720.66, 27.85, -590.72)
+})
+
+createMovementUI("Boulder", {
+    ["Jungle Gym"] = CFrame.new(-8614.81, 51.90, 2677.37),
+    ["Muscle King"] = CFrame.new(-8942.97, 60.71, -5692.74),
+    ["Legends Gym"] = CFrame.new(4188.75, 1019.85, -3905.19),
+    ["Mythical Gym"] = CFrame.new(2667.31, 58.88, 1202.46)
+})
+
 local LookDura = window:AddTab("Stats")
 local SelectPlayerName = ""
 

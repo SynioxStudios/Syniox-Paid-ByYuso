@@ -1822,6 +1822,7 @@ createMovementUI("Boulder", {
     ["Mythical Gym"] = CFrame.new(2667.31, 58.88, 1202.46),
     ["Frost Gym"] = CFrame.new(0, 0, 0)
 })
+
 local LookDura = window:AddTab("Stats")
 local SelectPlayerName = ""
 

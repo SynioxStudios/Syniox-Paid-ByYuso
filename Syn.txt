@@ -1744,43 +1744,45 @@ local function createMovementUI(moveName, gymLocations)
     
     GymTab:AddLabel("🏋️ " .. moveName)
 
-    local Drop = GymTab:AddDropdown("📍 Select Location", function(value)
-        selectedGym = value
+    local Drop = GymTab:AddDropdown("📍 Select Location", function(text)
+        selectedGym = text
     end)
 
-    Drop:AddOption("Jungle Gym")
-    Drop:AddOption("Muscle King")
-    Drop:AddOption("Legends Gym")
-    Drop:AddOption("Mythical Gym")
-    Drop:AddOption("Frost Gym")
+    Drop:Add("Jungle Gym")
+    Drop:Add("Muscle King")
+    Drop:Add("Legends Gym")
+    Drop:Add("Mythical Gym")
+    Drop:Add("Frost Gym")
 
     GymTab:AddSwitch("Auto " .. moveName, function(bool)
         active = bool
-        task.spawn(function()
-            while active do
-                local data = gymLocations[selectedGym]
-                local char = game.Players.LocalPlayer.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                
-                if root and data then
-                    if (root.Position - data.p).Magnitude > 5 then
-                        root.CFrame = data
-                        task.wait(0.3)
-                        pressEKey()
-                    end
+        if bool then
+            spawn(function()
+                while active do
+                    local data = gymLocations[selectedGym]
+                    local char = game.Players.LocalPlayer.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
                     
-                    local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
-                    if event then
-                        event:FireServer("rep")
+                    if root and data then
+                        if (root.Position - data.p).Magnitude > 5 then
+                            root.CFrame = data
+                            task.wait(0.3)
+                            pressEKey()
+                        end
+                        
+                        local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                        if event then
+                            event:FireServer("rep")
+                        end
                     end
+                    task.wait(0.05)
                 end
-                task.wait(0.05)
-            end
-        end)
+            end)
+        end
     end)
 end
 
-createMovementUI("Lift", {
+createMovementUI("Dumbbell Lift", {
     ["Jungle Gym"] = CFrame.new(-8652.85, 45.22, 2088.99),
     ["Muscle King"] = CFrame.new(-8774.03, 52.15, -5664.10),
     ["Legends Gym"] = CFrame.new(4532.02, 1025.80, -4002.15),

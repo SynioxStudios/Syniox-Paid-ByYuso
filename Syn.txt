@@ -403,6 +403,130 @@ StrTab:AddSwitch("👁️‍🗨️ Hide All Frames", function(state)
     end
 end)
 
+StrTab:AddSwitch("⏳ Anti Afk", function(Value)
+    if Value then
+        _G.AntiAfkActive = true
+        _G.AntiAfkLoopActive = true
+        
+        local vu = game:GetService("VirtualUser")
+        local TweenService = game:GetService("TweenService")
+        local RunService = game:GetService("RunService")
+        local Stats = game:GetService("Stats")
+        local player = game:GetService("Players").LocalPlayer
+        local playerGui = player:WaitForChild("PlayerGui")
+
+        _G.antiAfkConnection = player.Idled:Connect(function()
+            if _G.AntiAfkActive then
+                vu:CaptureController()
+                vu:ClickButton2(Vector2.new())
+            end
+        end)
+
+        local ScreenGui = Instance.new("ScreenGui")
+        local MainFrame = Instance.new("Frame")
+        local UICorner = Instance.new("UICorner")
+        local UIStroke = Instance.new("UIStroke")
+        local ContentFrame = Instance.new("Frame")
+        local UIListLayout = Instance.new("UIListLayout")
+
+        ScreenGui.Name = "Str_Premium_AFK"
+        ScreenGui.Parent = playerGui
+        ScreenGui.ResetOnSpawn = false
+
+        MainFrame.Name = "MainFrame"
+        MainFrame.Parent = ScreenGui
+        MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+        MainFrame.BackgroundTransparency = 0.2
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Position = UDim2.new(1, 20, 0.5, -50)
+        MainFrame.Size = UDim2.new(0, 140, 0, 95)
+        
+        UICorner.CornerRadius = UDim.new(0, 12)
+        UICorner.Parent = MainFrame
+
+        UIStroke.Parent = MainFrame
+        UIStroke.Thickness = 1.5
+        UIStroke.Color = Color3.fromRGB(40, 40, 40)
+        UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+        ContentFrame.Parent = MainFrame
+        ContentFrame.BackgroundTransparency = 1
+        ContentFrame.Size = UDim2.new(1, 0, 1, 0)
+        
+        UIListLayout.Parent = ContentFrame
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        UIListLayout.Padding = UDim.new(0, 2)
+        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+        local function CreateRow(icon, color)
+            local lbl = Instance.new("TextLabel")
+            lbl.Parent = ContentFrame
+            lbl.Size = UDim2.new(1, -20, 0, 25)
+            lbl.BackgroundTransparency = 1
+            lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+            lbl.TextSize = 13
+            lbl.Font = Enum.Font.GothamMedium
+            lbl.RichText = true
+            lbl.Text = string.format("<font color='rgb(%d,%d,%d)'>%s</font>", color.R*255, color.G*255, color.B*255, icon)
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            return lbl
+        end
+
+        local TimerLabel = CreateRow("🕒", Color3.fromRGB(255, 50, 50))
+        local FPSLabel = CreateRow("🚀", Color3.fromRGB(50, 255, 100))
+        local MSLabel = CreateRow("📡", Color3.fromRGB(50, 150, 255))
+
+        TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+            Position = UDim2.new(1, -155, 0.5, -50)
+        }):Play()
+
+        local startTime = os.time()
+        task.spawn(function()
+            local lastRender = tick()
+            while _G.AntiAfkActive and _G.AntiAfkLoopActive do
+                local diff = os.time() - startTime
+                TimerLabel.Text = string.format("<font color='rgb(255,50,50)'>🕒</font> %02d:%02d:%02d", math.floor(diff/3600), math.floor((diff%3600)/60), diff%60)
+                
+                RunService.RenderStepped:Wait()
+                local now = tick()
+                local fps = math.floor(1 / (now - lastRender))
+                lastRender = now
+                FPSLabel.Text = string.format("<font color='rgb(50,255,100)'>🚀</font> %d FPS", fps)
+                
+                local pingStat = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")
+                local ping = pingStat and math.floor(pingStat:GetValue()) or 0
+                MSLabel.Text = string.format("<font color='rgb(50,150,255)'>📡</font> %d MS", ping)
+            end
+        end)
+
+    else
+        _G.AntiAfkActive = false
+        _G.AntiAfkLoopActive = false
+        if _G.antiAfkConnection then
+            _G.antiAfkConnection:Disconnect()
+            _G.antiAfkConnection = nil
+        end
+        
+        local player = game:GetService("Players").LocalPlayer
+        local playerGui = player and player:FindFirstChild("PlayerGui")
+        if playerGui then
+            local oldGui = playerGui:FindFirstChild("Str_Premium_AFK")
+            if oldGui then
+                local frame = oldGui:FindFirstChild("MainFrame")
+                if frame then
+                    local TweenService = game:GetService("TweenService")
+                    TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+                        Position = UDim2.new(1, 20, 0.5, -50)
+                    }):Play()
+                    task.wait(0.4)
+                end
+                oldGui:Destroy()
+            end
+        end
+    end
+end)
+
 local sizeSwitch = StrTab:AddSwitch("Auto Size 2", function(bool)
     _G.autoSizeActive = bool
     

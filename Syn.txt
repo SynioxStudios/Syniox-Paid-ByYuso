@@ -429,6 +429,23 @@ Main:AddTextBox("🚀 Thread Speed", function(value)
     end
 end, {placeholder = "Enter Amount (Default: 1)"})
 
+_G.repToggle = false
+Main:AddSwitch("💪 Auto Farm (Equip Any tool)", function(state)
+    _G.repToggle = state
+    task.spawn(function()
+        while _G.repToggle do
+            local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+            if event then
+                for i = 1, repsPerTick do
+                    if not _G.repToggle then break end
+                    event:FireServer("rep")
+                end
+            end
+            task.wait(0.01)
+        end
+    end)
+end)
+
 local function manageTool(toolName)
     task.spawn(function()
         local player = game.Players.LocalPlayer

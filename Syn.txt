@@ -403,7 +403,7 @@ StrTab:AddSwitch("👁️‍🗨️ Hide All Frames", function(state)
     end
 end)
 
-StrTab:AddSwitch("⏳ Anti-Afk", function(Value)
+StrTab:AddSwitch("⏳ Anti Afk", function(Value)
     if Value then
         _G.AntiAfkActive = true
         _G.AntiAfkLoopActive = true

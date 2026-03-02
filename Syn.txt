@@ -1729,7 +1729,7 @@ end
 for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
 
-local GymTab = window:AddTab("Gym")
+local GymTab = window:AddTab("Gyım")
 local VIM = game:GetService("VirtualInputManager")
 
 local function pressEKey()
@@ -1745,16 +1745,14 @@ local function createMovementUI(moveName, gymLocations)
     
     GymTab:AddLabel("🏋️ " .. moveName)
 
-    -- Syniox Dropdown: Name, DefaultValue, OptionsList, Callback
-    GymTab:AddDropdown("📍 Select Location", "Jungle Gym", {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym", "Frost Gym"}, function(value)
+    GymTab:AddDropdown("📍 Select Location", {"Jungle Gym", "Muscle King", "Legends Gym", "Mythical Gym", "Frost Gym"}, function(value)
         selectedGym = value
     end)
 
-    -- Her hareket için özel hız ayarı
     GymTab:AddTextBox("🚀 Speed (Amount)", function(value)
         local num = tonumber(value)
         repsPerTick = (num and num > 0) and math.floor(num) or 1
-    end, {placeholder = "1"})
+    end, "1")
 
     GymTab:AddSwitch("Auto " .. moveName, function(bool)
         active = bool
@@ -1764,7 +1762,7 @@ local function createMovementUI(moveName, gymLocations)
                 local char = game.Players.LocalPlayer.Character
                 local root = char and char:FindFirstChild("HumanoidRootPart")
                 
-                if root and data and data ~= CFrame.new(0,0,0) then
+                if root and data then
                     if (root.Position - data.p).Magnitude > 5 then
                         root.CFrame = data
                         task.wait(0.3)
@@ -1785,7 +1783,6 @@ local function createMovementUI(moveName, gymLocations)
     end)
 end
 
--- Koordinat Tanımlamaları
 createMovementUI("Dumbbell Lift", {
     ["Jungle Gym"] = CFrame.new(-8652.85, 45.22, 2088.99),
     ["Muscle King"] = CFrame.new(-8774.03, 52.15, -5664.10),
@@ -1806,7 +1803,6 @@ createMovementUI("Squat", {
     ["Jungle Gym"] = CFrame.new(-8377.55, 48.71, 2864.90),
     ["Muscle King"] = CFrame.new(-8759.62, 46.50, -6041.16),
     ["Legends Gym"] = CFrame.new(4438.74, 1021.38, -4058.46),
-    ["Mythical Gym"] = CFrame.new(0, 0, 0),
     ["Frost Gym"] = CFrame.new(-2720.66, 27.85, -590.72)
 })
 
@@ -1814,8 +1810,7 @@ createMovementUI("Boulder", {
     ["Jungle Gym"] = CFrame.new(-8614.81, 51.90, 2677.37),
     ["Muscle King"] = CFrame.new(-8942.97, 60.71, -5692.74),
     ["Legends Gym"] = CFrame.new(4188.75, 1019.85, -3905.19),
-    ["Mythical Gym"] = CFrame.new(2667.31, 58.88, 1202.46),
-    ["Frost Gym"] = CFrame.new(0, 0, 0)
+    ["Mythical Gym"] = CFrame.new(2667.31, 58.88, 1202.46)
 })
 
 local LookDura = window:AddTab("Stats")

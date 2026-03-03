@@ -3103,6 +3103,7 @@ Misc:AddSwitch("🧱 Anti Knockback", function(Value)
         end
     end
 end)
+
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer

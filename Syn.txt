@@ -3297,6 +3297,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     local ListLayout = Instance.new("UIListLayout", Scroll)
     ListLayout.Padding = UDim.new(0, 5)
     ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
     local currentCategory = "Basic"
     local infernoRockData = {
     ["Basic"] = {
@@ -3698,7 +3699,9 @@ Misc:AddButton("💎 Legends Rock List", function()
     local ListLayout = Instance.new("UIListLayout", Scroll)
     ListLayout.Padding = UDim.new(0, 5)
     ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
     local currentCategory = "Basic"
+    local legendRockData = {
     ["Basic"] = {
         "Rebirth: 0",
         "Rebirth: 2",

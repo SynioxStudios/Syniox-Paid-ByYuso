@@ -365,7 +365,7 @@ StrTab:AddButton("🦵 Jungle Squat", function()
     end
 end)
 
-Misc:AddButton("🗑️ Anti-Lag", function()
+StrTab:AddButton("🗑️ Anti-Lag", function()
     local workspace = game:GetService("Workspace")
     
     for _, v in pairs(workspace:GetDescendants()) do

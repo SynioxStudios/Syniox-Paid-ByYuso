@@ -3242,7 +3242,6 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     ScreenGui.Name = "InfernoListUI"
     ScreenGui.Parent = game:GetService("CoreGui")
     local Main = Instance.new("Frame")
-    Main.Name = "MainFrame"
     Main.Parent = ScreenGui
     Main.BackgroundColor3 = Color3.fromRGB(8, 0, 1) 
     Main.Position = UDim2.new(0.5, -140, 0.5, -170)
@@ -3251,19 +3250,19 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     Main.Draggable = true
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
     local stroke = Instance.new("UIStroke", Main)
-    stroke.Color = Color3.fromRGB(255, 50, 50)
+    stroke.Color = Color3.fromRGB(255, 40, 40)
     stroke.Thickness = 2
     local Title = Instance.new("TextLabel", Main)
     Title.Size = UDim2.new(1, 0, 0, 35)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "INFERNO ROCK REBİRTH GLİTCH LİST"
+    Title.Text = "INFERNO REBIRTH LIST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextSize = 14
+    Title.TextSize = 18
     local Close = Instance.new("TextButton", Main)
-    Close.Size = UDim2.new(0, 22, 0, 22)
-    Close.Position = UDim2.new(1, -28, 0, 7)
-    Close.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    Close.Size = UDim2.new(0, 25, 0, 25)
+    Close.Position = UDim2.new(1, -32, 0, 5)
+    Close.BackgroundColor3 = Color3.fromRGB(255, 40, 40)
     Close.Text = "X"
     Close.Font = Enum.Font.GothamBold
     Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
@@ -3277,29 +3276,30 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     Grid.CellPadding = UDim2.new(0, 8, 0, 6)
     Grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
     local SearchBox = Instance.new("TextBox", Main)
-    SearchBox.Size = UDim2.new(1, -20, 0, 28)
+    SearchBox.Size = UDim2.new(1, -20, 0, 38)
     SearchBox.Position = UDim2.new(0, 10, 0, 110)
     SearchBox.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
-    SearchBox.Font = Enum.Font.GothamSemibold
-    SearchBox.PlaceholderText = "🔍 Enter Rebirth..."
+    SearchBox.Font = Enum.Font.GothamBold
+    SearchBox.PlaceholderText = "ENTER YOUR REBIRTH"
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SearchBox.TextSize = 16
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
     local sBox = Instance.new("UIStroke", SearchBox)
-    sBox.Color = Color3.fromRGB(255, 50, 50)
-    sBox.Thickness = 1
+    sBox.Color = Color3.fromRGB(255, 40, 40)
+    sBox.Thickness = 2
     local Scroll = Instance.new("ScrollingFrame", Main)
-    Scroll.Size = UDim2.new(1, -20, 1, -155)
-    Scroll.Position = UDim2.new(0, 10, 0, 145)
+    Scroll.Size = UDim2.new(1, -20, 1, -165)
+    Scroll.Position = UDim2.new(0, 10, 0, 155)
     Scroll.BackgroundTransparency = 1
-    Scroll.ScrollBarThickness = 2
-    Scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 50)
+    Scroll.ScrollBarThickness = 4
+    Scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 40, 40)
     local ListLayout = Instance.new("UIListLayout", Scroll)
-    ListLayout.Padding = UDim.new(0, 5)
+    ListLayout.Padding = UDim.new(0, 8)
     ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
     local currentCategory = "Basic"
-    local infernoRockData = {
+    local rockData = {
     ["Basic"] = {
         "Rebirth: 12",
         "Rebirth: 20",
@@ -3599,35 +3599,45 @@ Misc:AddButton("🔥 Inferno Rock List", function()
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end
-        local data = infernoRockData[category] or {}
-        local displayData = {}
-        if filterValue and filterValue ~= "" then
-            local num = tonumber(filterValue)
-            if num then
-                for _, val in pairs(data) do
-                    if val >= num * 0.5 then table.insert(displayData, val) end
-                end
-            end
-        else displayData = data end
-        Scroll.CanvasSize = UDim2.new(0, 0, 0, #displayData * 40)
-        for _, val in pairs(displayData) do
+        local data = rockData[category] or {}
+        table.sort(data)
+        local inputVal = tonumber(filterValue) or 0
+        local bestMatch = 0
+        for _, val in pairs(data) do
+            if val <= inputVal then bestMatch = val end
+        end
+        Scroll.CanvasSize = UDim2.new(0, 0, 0, #data * 55)
+        for _, val in pairs(data) do
             local lbl = Instance.new("TextLabel", Scroll)
-            lbl.Size = UDim2.new(0, 240, 0, 35)
-            lbl.BackgroundColor3 = Color3.fromRGB(30, 5, 5)
-            lbl.Text = "Required: " .. tostring(val)
+            lbl.Size = UDim2.new(0, 240, 0, 45)
+            lbl.Font = Enum.Font.GothamBold
             lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-            lbl.Font = Enum.Font.GothamSemibold
-            Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
+            lbl.TextSize = 18
+            Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 8)
+            if val == bestMatch and inputVal > 0 then
+                lbl.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+                lbl.Text = "⭐ CURRENT: " .. tostring(val)
+                local s = Instance.new("UIStroke", lbl)
+                s.Color = Color3.fromRGB(255, 255, 255)
+                s.Thickness = 2.5
+            elseif val > inputVal and inputVal > 0 then
+                lbl.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
+                lbl.Text = "NEXT: " .. tostring(val)
+            else
+                lbl.BackgroundColor3 = Color3.fromRGB(30, 5, 5)
+                lbl.Text = "REB: " .. tostring(val)
+                lbl.BackgroundTransparency = 0.4
+            end
         end
     end
-    local categories = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
-    for _, name in pairs(categories) do
+    local cats = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
+    for _, name in pairs(cats) do
         local b = Instance.new("TextButton", CatFrame)
-        b.BackgroundColor3 = Color3.fromRGB(45, 10, 10)
+        b.BackgroundColor3 = Color3.fromRGB(60, 15, 15)
         b.Text = name
         b.TextColor3 = Color3.fromRGB(255, 255, 255)
         b.Font = Enum.Font.GothamBold
-        b.TextSize = 11
+        b.TextSize = 14
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
         b.MouseButton1Click:Connect(function() currentCategory = name update(name, SearchBox.Text) end)
     end

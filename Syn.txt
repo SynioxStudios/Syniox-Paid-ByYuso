@@ -3257,7 +3257,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     Title.Size = UDim2.new(1, 0, 0, 35)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "INFERNO ROCK FINDER"
+    Title.Text = "INFERNO ROCK REBİRTH GLİTCH LİST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 14
     local Close = Instance.new("TextButton", Main)
@@ -3281,7 +3281,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     SearchBox.Position = UDim2.new(0, 10, 0, 110)
     SearchBox.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
     SearchBox.Font = Enum.Font.GothamSemibold
-    SearchBox.PlaceholderText = "🔍 Enter Strength..."
+    SearchBox.PlaceholderText = "🔍 Enter Rebirth..."
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
@@ -3659,7 +3659,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     Title.Size = UDim2.new(1, 0, 0, 35)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "LEGENDS ROCK FINDER"
+    Title.Text = "LEGENDS ROCK REBİRTH GLİTCH LİST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 14
     local Close = Instance.new("TextButton", Main)
@@ -3683,7 +3683,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     SearchBox.Position = UDim2.new(0, 10, 0, 110)
     SearchBox.BackgroundColor3 = Color3.fromRGB(5, 10, 20)
     SearchBox.Font = Enum.Font.GothamSemibold
-    SearchBox.PlaceholderText = "🔍 Enter Strength..."
+    SearchBox.PlaceholderText = "🔍 Enter Rebirth..."
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
@@ -4915,7 +4915,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     Title.Size = UDim2.new(1, 0, 0, 40)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "MUSCLE KING FINDER"
+    Title.Text = "MUSCLE KING REBİRTH GLİTCH LİST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 16
 
@@ -4942,7 +4942,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     SearchBox.Position = UDim2.new(0, 10, 0, 125)
     SearchBox.BackgroundColor3 = Color3.fromRGB(15, 10, 5)
     SearchBox.Font = Enum.Font.GothamSemibold
-    SearchBox.PlaceholderText = "🔍 Enter Strength (Ex: 5600)"
+    SearchBox.PlaceholderText = "🔍 Enter Rebirth (Ex: 5600)"
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     SearchBox.PlaceholderColor3 = Color3.fromRGB(150, 120, 80)

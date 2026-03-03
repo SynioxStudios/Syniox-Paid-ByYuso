@@ -3372,6 +3372,42 @@ Misc:AddButton("👤 Player ESP", function()
     end
 end)
 
+local targetSpeed = 200
+Misc:AddTextBox("Speed Value", function(value)
+    local num = tonumber(value)
+    if num then targetSpeed = num end
+end, {placeholder = "Enter number..."})
+
+_G.autoSpeed = false
+Misc:AddSwitch("Change Speed", function(state)
+    _G.autoSpeed = state
+    task.spawn(function()
+        while _G.autoSpeed do
+            if player.Character and player.Character:FindFirstChild("Humanoid") then
+                player.Character.Humanoid.WalkSpeed = targetSpeed
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+local targetSize = 2
+Misc:AddTextBox("Size Value", function(value)
+    local num = tonumber(value)
+    if num then targetSize = num end
+end, {placeholder = "Enter number..."})
+
+_G.autoSize = false
+Misc:AddSwitch("Change Size", function(state)
+    _G.autoSize = state
+    task.spawn(function()
+        while _G.autoSize do
+            rEvents.changeSpeedSizeRemote:InvokeServer("changeSize", targetSize)
+            task.wait(0.4)
+        end
+    end)
+end)
+
 local teleport = window:AddTab("Teleport")
 
 teleport:AddButton("📍Spawn", function()

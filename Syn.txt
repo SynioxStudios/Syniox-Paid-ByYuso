@@ -1365,6 +1365,8 @@ local autoGoodKarma = false
 local autoBadKarma = false
 local autoEquipPunch = false
 local autoPunchNoAnim = false
+local KillAuraRange = 20
+local CircleVisual = nil
 
 Killer:AddLabel("--- Misc ---")
 
@@ -1965,6 +1967,91 @@ end
 
 for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
+
+Killer:AddLabel("--------------------")
+Killer:AddLabel("--- Death Ring ---")
+
+Kill:AddTextBox("🎯 Aura Range", function(Value)
+    local num = tonumber(Value)
+    if num then
+        KillAuraRange = num
+    end
+end)
+
+Kill:AddSwitch("⚔️ Kill Aura", function(Value)
+    _G.KillAura = Value
+    task.spawn(function()
+        while _G.KillAura do
+            local localPlayer = game:GetService("Players").LocalPlayer
+            local character = localPlayer.Character
+            local targetFound = false
+            
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                for _, target in pairs(game:GetService("Players"):GetPlayers()) do
+                    if target ~= localPlayer and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then
+                        local distance = (character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).Magnitude
+                        
+                        if distance <= KillAuraRange then
+                            targetFound = true
+                            local tool = localPlayer.Backpack:FindFirstChildOfClass("Tool") or character:FindFirstChildOfClass("Tool")
+                            
+                            if tool then
+                                if tool.Parent == localPlayer.Backpack then
+                                    localPlayer.Humanoid:EquipTool(tool)
+                                end
+                                tool:Activate()
+                                firetouchinterest(target.Character.HumanoidRootPart, tool.Handle, 0)
+                                firetouchinterest(target.Character.HumanoidRootPart, tool.Handle, 1)
+                            end
+                        end
+                    end
+                end
+                
+                if not targetFound then
+                    local equippedTool = character:FindFirstChildOfClass("Tool")
+                    if equippedTool then
+                        localPlayer.Humanoid:UnequipTools()
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+Kill:AddSwitch("⭕ Show Aura Range", function(Value)
+    _G.ShowRange = Value
+    if Value then
+        CircleVisual = Instance.new("Part")
+        CircleVisual.Name = "AuraCircle"
+        CircleVisual.Parent = game.Workspace
+        CircleVisual.Anchored = true
+        CircleVisual.CanCollide = false
+        CircleVisual.CastShadow = false
+        CircleVisual.Shape = Enum.PartType.Cylinder
+        CircleVisual.Material = Enum.Material.ForceField
+        CircleVisual.Color = Color3.fromRGB(255, 0, 0)
+        CircleVisual.Transparency = 0.5
+        CircleVisual.Size = Vector3.new(0.5, KillAuraRange * 2, KillAuraRange * 2)
+        CircleVisual.Rotation = Vector3.new(0, 0, 90)
+
+        task.spawn(function()
+            while _G.ShowRange do
+                local char = game.Players.LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") and CircleVisual then
+                    CircleVisual.Position = char.HumanoidRootPart.Position - Vector3.new(0, 2.8, 0)
+                    CircleVisual.Size = Vector3.new(0.5, KillAuraRange * 2, KillAuraRange * 2)
+                end
+                task.wait()
+            end
+        end)
+    else
+        if CircleVisual then
+            CircleVisual:Destroy()
+            CircleVisual = nil
+        end
+    end
+end)
 
 local GymTab = window:AddTab("Gym")
 local VIM = game:GetService("VirtualInputManager")

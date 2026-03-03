@@ -4857,6 +4857,7 @@ Misc:AddButton("💎 Legends Rock List", function()
         "Rebirth: 85480",
         "Rebirth: 94980"
     }
+}
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end

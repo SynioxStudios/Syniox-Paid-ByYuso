@@ -5052,6 +5052,113 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     updateList("Basic")
 end)
 
+Misc:AddButton("👑 Muscle King Rock List", function()
+    local TS = game:GetService("TweenService")
+    if game:GetService("CoreGui"):FindFirstChild("MuscleKingUI") then 
+        game:GetService("CoreGui").MuscleKingUI:Destroy() 
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "MuscleKingUI"
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local Main = Instance.new("Frame")
+    Main.Name = "MainFrame"
+    Main.Parent = ScreenGui
+    Main.BackgroundColor3 = Color3.fromRGB(8, 0, 1) 
+    Main.Position = UDim2.new(0.5, -140, 0.5, -175)
+    Main.Size = UDim2.new(0, 280, 0, 350)
+    Main.Active = true
+    Main.Draggable = true
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+    local stroke = Instance.new("UIStroke", Main)
+    stroke.Color = Color3.fromRGB(200, 150, 0)
+    stroke.Thickness = 2
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.BackgroundTransparency = 1
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = "MUSCLE KING LIST"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 16
+
+    local Close = Instance.new("TextButton", Main)
+    Close.Size = UDim2.new(0, 25, 0, 25)
+    Close.Position = UDim2.new(1, -30, 0, 7)
+    Close.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+    Close.Text = "X"
+    Close.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
+    Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+    local CatFrame = Instance.new("Frame", Main)
+    CatFrame.Size = UDim2.new(1, -20, 0, 75)
+    CatFrame.Position = UDim2.new(0, 10, 0, 45)
+    CatFrame.BackgroundColor3 = Color3.fromRGB(18, 0, 2)
+    CatFrame.BackgroundTransparency = 0.4
+    Instance.new("UICorner", CatFrame).CornerRadius = UDim.new(0, 8)
+    
+    local Grid = Instance.new("UIGridLayout", CatFrame)
+    Grid.CellSize = UDim2.new(0, 80, 0, 30)
+    Grid.CellPadding = UDim2.new(0, 8, 0, 8)
+    Grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    local Scroll = Instance.new("ScrollingFrame", Main)
+    Scroll.Size = UDim2.new(1, -20, 1, -140)
+    Scroll.Position = UDim2.new(0, 10, 0, 130)
+    Scroll.BackgroundTransparency = 1
+    Scroll.ScrollBarThickness = 2
+    Scroll.ScrollBarImageColor3 = Color3.fromRGB(200, 150, 0)
+    
+    local ListLayout = Instance.new("UIListLayout", Scroll)
+    ListLayout.Padding = UDim.new(0, 5)
+    ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    local kingRockData = {
+        ["Basic"] = {"Rock 1: 0", "Rock 2: 0"},
+        ["Advanced"] = {"Adv Rock 1: 0"},
+        ["Rare"] = {"Rare Rock 1: 0"},
+        ["Epic"] = {"Epic Rock 1: 0"},
+        ["Unique"] = {"Unique Rock 1: 0"}
+    }
+
+    local function update(category)
+        for _, v in pairs(Scroll:GetChildren()) do 
+            if v:IsA("TextLabel") then v:Destroy() end 
+        end
+        local data = kingRockData[category] or {}
+        Scroll.CanvasSize = UDim2.new(0, 0, 0, #data * 40)
+        for _, text in pairs(data) do
+            local lbl = Instance.new("TextLabel", Scroll)
+            lbl.Size = UDim2.new(0, 240, 0, 35)
+            lbl.BackgroundColor3 = Color3.fromRGB(25, 20, 5)
+            lbl.Text = text
+            lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+            lbl.Font = Enum.Font.GothamSemibold
+            Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
+            local s = Instance.new("UIStroke", lbl)
+            s.Color = Color3.fromRGB(200, 150, 0)
+            s.Thickness = 1
+            s.Transparency = 0.8
+        end
+    end
+
+    local categories = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
+    for _, name in pairs(categories) do
+        local b = Instance.new("TextButton", CatFrame)
+        b.BackgroundColor3 = Color3.fromRGB(40, 30, 10)
+        b.Text = name
+        b.TextColor3 = Color3.fromRGB(255, 255, 255)
+        b.Font = Enum.Font.GothamBold
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+        b.MouseButton1Click:Connect(function() update(name) end)
+    end
+
+    update("Basic")
+end)
+
 local scriptFolder = Misc:AddFolder(" 📜 External Scripts")
 
 scriptFolder:AddButton("⚡ Infinite Yield", function()

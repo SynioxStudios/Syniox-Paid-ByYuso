@@ -3242,8 +3242,10 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     local Frame = Instance.new("Frame")
     local Title = Instance.new("TextLabel")
     local CloseButton = Instance.new("TextButton")
+    local CategoryFrame = Instance.new("Frame")
     local ScrollingFrame = Instance.new("ScrollingFrame")
     local UIListLayout = Instance.new("UIListLayout")
+    local UIGridLayout = Instance.new("UIGridLayout")
 
     ScreenGui.Parent = game:GetService("CoreGui")
     ScreenGui.Name = "InfernoListUI"
@@ -3251,13 +3253,12 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     Frame.Name = "MainFrame"
     Frame.Parent = ScreenGui
     Frame.BackgroundColor3 = Color3.fromRGB(15, 5, 5)
-    Frame.Position = UDim2.new(0.5, -125, 0.5, -150)
-    Frame.Size = UDim2.new(0, 260, 0, 320)
+    Frame.Position = UDim2.new(0.5, -150, 0.5, -200)
+    Frame.Size = UDim2.new(0, 300, 0, 400)
     Frame.BorderSizePixel = 0
     Frame.Active = true
     Frame.Draggable = true
-    local mainCorner = Instance.new("UICorner", Frame)
-    mainCorner.CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 10)
 
     Title.Parent = Frame
     Title.BackgroundTransparency = 1
@@ -3276,56 +3277,82 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     CloseButton.Text = "X"
     CloseButton.Font = Enum.Font.GothamBold
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    local closeCorner = Instance.new("UICorner", CloseButton)
-    closeCorner.CornerRadius = UDim.new(1, 0)
+    Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(1, 0)
+
+    CategoryFrame.Name = "Categories"
+    CategoryFrame.Parent = Frame
+    CategoryFrame.BackgroundTransparency = 1
+    CategoryFrame.Position = UDim2.new(0, 10, 0, 45)
+    CategoryFrame.Size = UDim2.new(1, -20, 0, 80)
+
+    UIGridLayout.Parent = CategoryFrame
+    UIGridLayout.CellSize = UDim2.new(0, 85, 0, 30)
+    UIGridLayout.CellPadding = UDim2.new(0, 10, 0, 10)
+    UIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
     ScrollingFrame.Parent = Frame
     ScrollingFrame.BackgroundTransparency = 1
-    ScrollingFrame.Position = UDim2.new(0, 10, 0, 50)
-    ScrollingFrame.Size = UDim2.new(1, -20, 1, -60)
-    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+    ScrollingFrame.Position = UDim2.new(0, 10, 0, 135)
+    ScrollingFrame.Size = UDim2.new(1, -20, 1, -145)
+    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
     ScrollingFrame.ScrollBarThickness = 3
     ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 60, 0)
 
     UIListLayout.Parent = ScrollingFrame
-    UIListLayout.Padding = UDim.new(0, 6)
+    UIListLayout.Padding = UDim.new(0, 5)
     UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    local rockNumbers = {
-        "Rock 1: [12]",
-        "Rock 2: [20]",
-        "Rock 3: [44]",
-        "Rock 4: [60]",
-        "Rock 5: [Sayıyı Yaz]",
-        "Rock 6: [Sayıyı Yaz]",
-        "Rock 7: [Sayıyı Yaz]",
-        "Rock 8: [Sayıyı Yaz]",
-        "Rock 9: [Sayıyı Yaz]",
-        "Rock 10: [Sayıyı Yaz]",
-        "Rock 11: [Sayıyı Yaz]",
-        "Rock 12: [Sayıyı Yaz]",
-        "Rock 13: [Sayıyı Yaz]",
-        "Rock 14: [Sayıyı Yaz]",
-        "Rock 15: [Sayıyı Yaz]"
+    local rockData = {
+        ["Basic"] = {"B-Rock 1: 0", "B-Rock 2: 0", "B-Rock 3: 0"},
+        ["Advanced"] = {"A-Rock 1: 0", "A-Rock 2: 0"},
+        ["Rare"] = {"R-Rock 1: 0", "R-Rock 2: 0"},
+        ["Epic"] = {"E-Rock 1: 0", "E-Rock 2: 0"},
+        ["Unique"] = {"U-Rock 1: 0", "U-Rock 2: 0"}
     }
 
-    for _, data in pairs(rockNumbers) do
-        local label = Instance.new("TextLabel")
-        label.Parent = ScrollingFrame
-        label.Size = UDim2.new(0, 220, 0, 35)
-        label.BackgroundColor3 = Color3.fromRGB(35, 10, 5)
-        label.Font = Enum.Font.GothamSemibold
-        label.Text = data
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.TextSize = 13
-        local labelCorner = Instance.new("UICorner", label)
-        labelCorner.CornerRadius = UDim.new(0, 6)
+    local function updateList(category)
+        for _, child in pairs(ScrollingFrame:GetChildren()) do
+            if child:IsA("TextLabel") then child:Destroy() end
+        end
         
-        local stroke = Instance.new("UIStroke", label)
-        stroke.Color = Color3.fromRGB(255, 60, 0)
-        stroke.Thickness = 1
-        stroke.Transparency = 0.5
+        local data = rockData[category]
+        ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #data * 40)
+        
+        for _, text in pairs(data) do
+            local label = Instance.new("TextLabel")
+            label.Parent = ScrollingFrame
+            label.Size = UDim2.new(0, 240, 0, 35)
+            label.BackgroundColor3 = Color3.fromRGB(35, 10, 5)
+            label.Font = Enum.Font.GothamSemibold
+            label.Text = text
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            label.TextSize = 13
+            Instance.new("UICorner", label).CornerRadius = UDim.new(0, 6)
+            local s = Instance.new("UIStroke", label)
+            s.Color = Color3.fromRGB(255, 60, 0)
+            s.Thickness = 1
+            s.Transparency = 0.6
+        end
     end
+
+    local categories = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
+    for _, name in pairs(categories) do
+        local btn = Instance.new("TextButton")
+        btn.Name = name
+        btn.Parent = CategoryFrame
+        btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5)
+        btn.Font = Enum.Font.GothamBold
+        btn.Text = name
+        btn.TextColor3 = Color3.fromRGB(255, 200, 100)
+        btn.TextSize = 12
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+        
+        btn.MouseButton1Click:Connect(function()
+            updateList(name)
+        end)
+    end
+
+    updateList("Basic")
 
     CloseButton.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()

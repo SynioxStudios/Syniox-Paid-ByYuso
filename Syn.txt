@@ -1969,7 +1969,7 @@ for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
 
 Killer:AddLabel("--------------------")
-Killer:AddLabel("--- Death Ring ---")
+Killer:AddLabel("--- Death Ring V2 ---")
 
 Killer:AddTextBox("🎯 Aura Range", function(Value)
     local num = tonumber(Value)
@@ -1980,48 +1980,49 @@ end)
 
 Killer:AddSwitch("⚔️ Kill Aura", function(Value)
     _G.KillAura = Value
-    task.spawn(function()
-        while _G.KillAura do
-            local localPlayer = game:GetService("Players").LocalPlayer
-            local character = localPlayer.Character
-            local targetFound = false
-            
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                for _, target in pairs(game:GetService("Players"):GetPlayers()) do
-                    if target ~= localPlayer and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then
-                        local distance = (character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).Magnitude
-                        
-                        if distance <= KillAuraRange then
-                            targetFound = true
-                            local tool = localPlayer.Backpack:FindFirstChildOfClass("Tool") or character:FindFirstChildOfClass("Tool")
+    if _G.KillAura then
+        task.spawn(function()
+            while _G.KillAura do
+                local character = player.Character
+                local targetFound = false
+                
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    for _, target in pairs(game:GetService("Players"):GetPlayers()) do
+                        if target ~= player and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then
+                            local distance = (character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).Magnitude
                             
-                            if tool then
-                                if tool.Parent == localPlayer.Backpack then
-                                    localPlayer.Humanoid:EquipTool(tool)
+                            if distance <= KillAuraRange then
+                                targetFound = true
+                                local punch = player.Backpack:FindFirstChild("Punch") or character:FindFirstChild("Punch")
+                                
+                                if punch then
+                                    if punch.Parent ~= character then
+                                        punch.Parent = character
+                                    end
+                                    muscleEvent:FireServer("punch", "rightHand")
+                                    muscleEvent:FireServer("punch", "leftHand")
                                 end
-                                tool:Activate()
-                                firetouchinterest(target.Character.HumanoidRootPart, tool.Handle, 0)
-                                firetouchinterest(target.Character.HumanoidRootPart, tool.Handle, 1)
                             end
                         end
                     end
-                end
-                
-                if not targetFound then
-                    local equippedTool = character:FindFirstChildOfClass("Tool")
-                    if equippedTool then
-                        localPlayer.Humanoid:UnequipTools()
+                    
+                    if not targetFound then
+                        local equippedPunch = character:FindFirstChild("Punch")
+                        if equippedPunch then
+                            equippedPunch.Parent = player.Backpack
+                        end
                     end
                 end
+                task.wait(0.01)
             end
-            task.wait(0.1)
-        end
-    end)
+        end)
+    end
 end)
 
 Killer:AddSwitch("⭕ Show Aura Range", function(Value)
     _G.ShowRange = Value
-    if Value then
+    if _G.ShowRange then
+        if CircleVisual then CircleVisual:Destroy() end
         CircleVisual = Instance.new("Part")
         CircleVisual.Name = "AuraCircle"
         CircleVisual.Parent = game.Workspace
@@ -2032,15 +2033,17 @@ Killer:AddSwitch("⭕ Show Aura Range", function(Value)
         CircleVisual.Material = Enum.Material.ForceField
         CircleVisual.Color = Color3.fromRGB(255, 0, 0)
         CircleVisual.Transparency = 0.5
-        CircleVisual.Size = Vector3.new(0.5, KillAuraRange * 2, KillAuraRange * 2)
         CircleVisual.Rotation = Vector3.new(0, 0, 90)
 
         task.spawn(function()
             while _G.ShowRange do
-                local char = game.Players.LocalPlayer.Character
+                local char = player.Character
                 if char and char:FindFirstChild("HumanoidRootPart") and CircleVisual then
-                    CircleVisual.Position = char.HumanoidRootPart.Position - Vector3.new(0, 2.8, 0)
+                    CircleVisual.Position = char.HumanoidRootPart.Position - Vector3.new(0, 2.5, 0)
                     CircleVisual.Size = Vector3.new(0.5, KillAuraRange * 2, KillAuraRange * 2)
+                    CircleVisual.Transparency = 0.5
+                else
+                    if CircleVisual then CircleVisual.Transparency = 1 end
                 end
                 task.wait()
             end

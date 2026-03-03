@@ -1971,14 +1971,14 @@ Players.PlayerAdded:Connect(updateAllDropdowns)
 Killer:AddLabel("--------------------")
 Killer:AddLabel("--- Death Ring ---")
 
-Kill:AddTextBox("🎯 Aura Range", function(Value)
+Killer:AddTextBox("🎯 Aura Range", function(Value)
     local num = tonumber(Value)
     if num then
         KillAuraRange = num
     end
 end)
 
-Kill:AddSwitch("⚔️ Kill Aura", function(Value)
+Killer:AddSwitch("⚔️ Kill Aura", function(Value)
     _G.KillAura = Value
     task.spawn(function()
         while _G.KillAura do
@@ -2019,7 +2019,7 @@ Kill:AddSwitch("⚔️ Kill Aura", function(Value)
     end)
 end)
 
-Kill:AddSwitch("⭕ Show Aura Range", function(Value)
+Killer:AddSwitch("⭕ Show Aura Range", function(Value)
     _G.ShowRange = Value
     if Value then
         CircleVisual = Instance.new("Part")

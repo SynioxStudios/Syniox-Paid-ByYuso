@@ -3669,7 +3669,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     Title.Size = UDim2.new(1, 0, 0, 35)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "LEGENDS ROCK REBİRTH GLİTCH LİST"
+    Title.Text = "LEGENDS ROCK REBIRTH GLITCH LIST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 14
     local Close = Instance.new("TextButton", Main)
@@ -3696,6 +3696,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     SearchBox.PlaceholderText = "🔍 Enter Rebirth..."
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SearchBox.TextSize = 14 -- Burayı 14 yaptım
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
     local sBox = Instance.new("UIStroke", SearchBox)
     sBox.Color = Color3.fromRGB(0, 180, 255)
@@ -4856,7 +4857,6 @@ Misc:AddButton("💎 Legends Rock List", function()
         "Rebirth: 85480",
         "Rebirth: 94980"
     }
-}
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end
@@ -4878,6 +4878,7 @@ Misc:AddButton("💎 Legends Rock List", function()
             lbl.Text = "Required: " .. tostring(val)
             lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
             lbl.Font = Enum.Font.GothamSemibold
+            lbl.TextSize = 7 -- Burayı 7 yaptım
             Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
         end
     end
@@ -4894,8 +4895,6 @@ Misc:AddButton("💎 Legends Rock List", function()
     end
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function() update(currentCategory, SearchBox.Text) end)
     update("Basic")
-end)
-
 
 Misc:AddButton("👑 Muscle King Rock List", function()
     local TS = game:GetService("TweenService")

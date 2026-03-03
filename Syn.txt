@@ -1034,6 +1034,7 @@ RockFolder:AddSwitch("🌴 Jungle Rock 10M", function(Value)
 end)
 
 local lp = game:GetService("Players").LocalPlayer
+local runService = game:GetService("RunService")
 
 local rockData = {
     ["Tiny Rock"] = {dur = 0, pos = Vector3.new(12.90, 2.22, 2096.17)},
@@ -1050,26 +1051,19 @@ local rockData = {
 local selectedRock = ""
 local rockActive = false
 
-Main:AddLabel("👊 Rock Farm V2")
+Main:AddLabel("👊 Rock Farm 2")
 
 local RockDrop = Main:AddDropdown("📍 Select Rock", function(text)
     selectedRock = text
 end)
 
-RockDrop:Add("Tiny Rock")
-RockDrop:Add("Starter Rock")
-RockDrop:Add("Golden Rock")
-RockDrop:Add("Frost Rock")
-RockDrop:Add("Mythical Rock")
-RockDrop:Add("Eternal Rock")
-RockDrop:Add("Legend Rock")
-RockDrop:Add("Muscle King Rock")
-RockDrop:Add("Jungle Rock")
+for name, _ in pairs(rockData) do RockDrop:Add(name) end
 
 Main:AddSwitch("Auto Rock Farm", function(state)
     rockActive = state
+    
     if state then
-        spawn(function()
+        task.spawn(function()
             while rockActive do
                 task.wait()
                 local data = rockData[selectedRock]
@@ -1079,8 +1073,20 @@ Main:AddSwitch("Auto Rock Farm", function(state)
                 
                 if data and root and lp.Durability.Value >= data.dur then
                     if (root.Position - data.pos).Magnitude > 8 then
+                        if getgenv().posLock then 
+                            getgenv().posLock:Disconnect() 
+                            getgenv().posLock = nil 
+                        end
+                        
                         root.CFrame = CFrame.new(data.pos)
-                        task.wait(0.2)
+                        task.wait(0.5)
+                        
+                        local currentPos = root.CFrame
+                        getgenv().posLock = runService.Heartbeat:Connect(function()
+                            if char:FindFirstChild("HumanoidRootPart") then
+                                char.HumanoidRootPart.CFrame = currentPos
+                            end
+                        end)
                     end
 
                     if punch then
@@ -1094,6 +1100,10 @@ Main:AddSwitch("Auto Rock Farm", function(state)
             end
         end)
     else
+        if getgenv().posLock then
+            getgenv().posLock:Disconnect()
+            getgenv().posLock = nil
+        end
         if lp.Character and lp.Character:FindFirstChild("Punch") then
             lp.Character.Punch.Parent = lp.Backpack
         end

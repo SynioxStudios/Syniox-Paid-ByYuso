@@ -1051,7 +1051,7 @@ local rockData = {
 local selectedRock = ""
 local rockActive = false
 
-Main:AddLabel("👊 Rock Farm 2")
+Main:AddLabel("👊 Rock Farm V2")
 
 local RockDrop = Main:AddDropdown("📍 Select Rock", function(text)
     selectedRock = text
@@ -1079,12 +1079,12 @@ Main:AddSwitch("Auto Rock Farm", function(state)
                         end
                         
                         root.CFrame = CFrame.new(data.pos)
-                        task.wait(0.5)
+                        task.wait(0.2)
                         
-                        local currentPos = root.CFrame
+                        local targetCFrame = root.CFrame
                         getgenv().posLock = runService.Heartbeat:Connect(function()
                             if char:FindFirstChild("HumanoidRootPart") then
-                                char.HumanoidRootPart.CFrame = currentPos
+                                char.HumanoidRootPart.CFrame = targetCFrame
                             end
                         end)
                     end

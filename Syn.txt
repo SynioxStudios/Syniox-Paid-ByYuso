@@ -4914,6 +4914,144 @@ local legendRockData = {
     end)
 end)
 
+Misc:AddButton("👑 Muscle King Rock List", function()
+    local TS = game:GetService("TweenService")
+    if game:GetService("CoreGui"):FindFirstChild("MuscleKingUI") then 
+        game:GetService("CoreGui").MuscleKingUI:Destroy() 
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "MuscleKingUI"
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local Main = Instance.new("Frame")
+    Main.Name = "MainFrame"
+    Main.Parent = ScreenGui
+    Main.BackgroundColor3 = Color3.fromRGB(8, 5, 0)
+    Main.Position = UDim2.new(0.5, -140, 0.5, -175)
+    Main.Size = UDim2.new(0, 280, 0, 350)
+    Main.Active = true
+    Main.Draggable = true
+    local mainCorner = Instance.new("UICorner", Main)
+    mainCorner.CornerRadius = UDim.new(0, 14)
+
+    local stroke = Instance.new("UIStroke", Main)
+    stroke.Color = Color3.fromRGB(255, 200, 0)
+    stroke.Thickness = 3
+    local borderGrad = Instance.new("UIGradient", stroke)
+    borderGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 210, 40)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 120, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 210, 40))
+    })
+    TS:Create(borderGrad, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {Rotation = 360}):Play()
+
+    for _ = 1, 25 do
+        local star = Instance.new("Frame", Main)
+        star.Size = UDim2.new(0, math.random(1,3), 0, math.random(1,3))
+        star.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        star.BackgroundColor3 = Color3.fromRGB(255, 230, 100)
+        star.BackgroundTransparency = 0.5
+        Instance.new("UICorner", star).CornerRadius = UDim.new(1, 0)
+    end
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1, 0, 0, 35)
+    Title.Position = UDim2.new(0, 0, 0, 5)
+    Title.BackgroundTransparency = 1
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = "MUSCLE KING LIST"
+    Title.TextColor3 = Color3.fromRGB(255, 210, 0)
+    Title.TextSize = 16
+    local tGrad = Instance.new("UIGradient", Title)
+    tGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 200)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 200, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 200))
+    })
+
+    local Close = Instance.new("TextButton", Main)
+    Close.Size = UDim2.new(0, 22, 0, 22)
+    Close.Position = UDim2.new(1, -28, 0, 8)
+    Close.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
+    Close.Text = "X"
+    Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Close.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
+    Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+    local CatFrame = Instance.new("Frame", Main)
+    CatFrame.Size = UDim2.new(1, -20, 0, 70)
+    CatFrame.Position = UDim2.new(0, 10, 0, 40)
+    CatFrame.BackgroundTransparency = 1
+    local Grid = Instance.new("UIGridLayout", CatFrame)
+    Grid.CellSize = UDim2.new(0, 80, 0, 28)
+    Grid.CellPadding = UDim2.new(0, 8, 0, 8)
+    Grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    local Scroll = Instance.new("ScrollingFrame", Main)
+    Scroll.Size = UDim2.new(1, -10, 1, -135)
+    Scroll.Position = UDim2.new(0, 5, 0, 125)
+    Scroll.BackgroundTransparency = 1
+    Scroll.ScrollBarThickness = 2
+    Scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 200, 0)
+    local ListLayout = Instance.new("UIListLayout", Scroll)
+    ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    ListLayout.Padding = UDim.new(0, 5)
+
+    local kingRockData = {
+        ["Basic"] = {"K-Rock 1: 0", "K-Rock 2: 0"},
+        ["Advanced"] = {"KA-Rock 1: 0"},
+        ["Rare"] = {"KR-Rock 1: 0"},
+        ["Epic"] = {"KE-Rock 1: 0"},
+        ["Unique"] = {"KU-Rock 1: 0"}
+    }
+
+    local function updateList(category)
+        for _, child in pairs(Scroll:GetChildren()) do
+            if child:IsA("TextLabel") then child:Destroy() end
+        end
+        local data = kingRockData[category] or {}
+        Scroll.CanvasSize = UDim2.new(0, 0, 0, #data * 38)
+        for _, text in pairs(data) do
+            local label = Instance.new("TextLabel", Scroll)
+            label.Size = UDim2.new(0, 240, 0, 32)
+            label.BackgroundColor3 = Color3.fromRGB(25, 20, 5)
+            label.Font = Enum.Font.GothamBold
+            label.Text = text
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            label.TextSize = 12
+            Instance.new("UICorner", label).CornerRadius = UDim.new(0, 8)
+            local s = Instance.new("UIStroke", label)
+            s.Color = Color3.fromRGB(255, 200, 0)
+            s.Thickness = 1
+            s.Transparency = 0.7
+        end
+    end
+
+    local categories = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
+    for _, name in pairs(categories) do
+        local btn = Instance.new("TextButton", CatFrame)
+        btn.BackgroundColor3 = Color3.fromRGB(50, 40, 10)
+        btn.Font = Enum.Font.GothamBold
+        btn.Text = name
+        btn.TextColor3 = Color3.fromRGB(255, 210, 100)
+        btn.TextSize = 11
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+        
+        btn.MouseEnter:Connect(function()
+            TS:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 80, 20)}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TS:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 40, 10)}):Play()
+        end)
+        btn.MouseButton1Click:Connect(function() updateList(name) end)
+    end
+
+    updateList("Basic")
+end)
+
 local scriptFolder = Misc:AddFolder(" 📜 External Scripts")
 
 scriptFolder:AddButton("⚡ Infinite Yield", function()

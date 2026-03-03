@@ -1980,7 +1980,7 @@ for _, p in ipairs(Players:GetPlayers()) do updateAllDropdowns(p) end
 Players.PlayerAdded:Connect(updateAllDropdowns)
 
 Killer:AddLabel("--------------------")
-Killer:AddLabel("--- Death Ring V2 ---")
+Killer:AddLabel("--- Death Ring ---")
 
 Killer:AddTextBox("🎯 Aura Range", function(Value)
     local num = tonumber(Value)
@@ -2000,7 +2000,8 @@ Killer:AddSwitch("⚔️ Kill Aura", function(Value)
                 if character and character:FindFirstChild("HumanoidRootPart") then
                     for _, target in pairs(game:GetService("Players"):GetPlayers()) do
                         if target ~= player and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then
-                            local distance = (character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).Magnitude
+                            local targetPart = target.Character.HumanoidRootPart
+                            local distance = (character.HumanoidRootPart.Position - targetPart.Position).Magnitude
                             
                             if distance <= KillAuraRange then
                                 targetFound = true
@@ -2010,8 +2011,15 @@ Killer:AddSwitch("⚔️ Kill Aura", function(Value)
                                     if punch.Parent ~= character then
                                         punch.Parent = character
                                     end
+                                    
                                     muscleEvent:FireServer("punch", "rightHand")
                                     muscleEvent:FireServer("punch", "leftHand")
+                                    
+                                    local punchHandle = punch:FindFirstChild("Handle") or punch:FindFirstChildWhichIsA("BasePart")
+                                    if punchHandle then
+                                        firetouchinterest(targetPart, punchHandle, 0)
+                                        firetouchinterest(targetPart, punchHandle, 1)
+                                    end
                                 end
                             end
                         end

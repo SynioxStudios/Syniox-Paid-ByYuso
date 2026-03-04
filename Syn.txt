@@ -5869,6 +5869,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
         "Rebirth: 17080",
         "Rebirth: 18980"
     }
+}
 
     local function updateList(category)
         for _, child in pairs(ScrollingFrame:GetChildren()) do

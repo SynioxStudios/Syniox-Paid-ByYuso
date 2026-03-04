@@ -3605,7 +3605,6 @@ Misc:AddButton("🔥 Inferno Rock List", function()
         "Rebirth: 169980",
         "Rebirth: 189980"
         }
-    }
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do 
@@ -4888,7 +4887,6 @@ Misc:AddButton("💎 Legends Rock List", function()
         "Rebirth: 85480",
         "Rebirth: 94980"
         }
-    }
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do 
@@ -5150,7 +5148,6 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     ["Epic"] = {},
     ["Unique"] = {}
         }
-    }
 
     local function update(category, filterValue)
         for _, v in pairs(Scroll:GetChildren()) do 

@@ -3246,7 +3246,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     local Main = Instance.new("Frame")
     Main.Name = "MainFrame"
     Main.Parent = ScreenGui
-    Main.BackgroundColor3 = Color3.fromRGB(10, 0, 0) 
+    Main.BackgroundColor3 = Color3.fromRGB(10, 0, 0)
     Main.Position = UDim2.new(0.5, -140, 0.5, -175)
     Main.Size = UDim2.new(0, 280, 0, 380)
     Main.Active = true
@@ -3292,7 +3292,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     SearchBox.PlaceholderColor3 = Color3.fromRGB(150, 50, 50)
-    SearchBox.TextSize = 14 -- SearchBox Boyutu 14
+    SearchBox.TextSize = 14
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
     local sBox = Instance.new("UIStroke", SearchBox)
     sBox.Color = Color3.fromRGB(255, 40, 40)
@@ -3616,14 +3616,12 @@ Misc:AddButton("🔥 Inferno Rock List", function()
         local inputNum = tonumber(filterValue)
 
         for _, val in pairs(data) do
-            -- Yazının içindeki sayıyı çekiyoruz (Match)
             local rockReb = tonumber(val:match("%d+")) 
             local show = false
 
             if not inputNum or filterValue == "" then
                 show = true
             else
-                -- Senin istediğin %70 - %130 aralığı mantığı
                 if rockReb >= inputNum * 0.7 and rockReb <= inputNum * 1.3 then
                     show = true
                 end
@@ -3636,7 +3634,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
                 lbl.Text = val
                 lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                 lbl.Font = Enum.Font.GothamSemibold
-                lbl.TextSize = 7 -- Liste Yazı Boyutu 7
+                lbl.TextSize = 7
                 Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
                 local s = Instance.new("UIStroke", lbl)
                 s.Color = Color3.fromRGB(255, 40, 40)
@@ -3658,7 +3656,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
         b.MouseButton1Click:Connect(function() 
             currentCategory = name
-            update(name, SearchBox.Text) 
+            update(name, SearchBox.Text)
         end)
     end
 
@@ -3666,7 +3664,7 @@ Misc:AddButton("🔥 Inferno Rock List", function()
         update(currentCategory, SearchBox.Text)
     end)
 
-    update("Basic")
+    update("Basic", "")
 end)
 
 Misc:AddButton("💎 Legends Rock List", function()
@@ -3682,7 +3680,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     local Main = Instance.new("Frame")
     Main.Name = "MainFrame"
     Main.Parent = ScreenGui
-    Main.BackgroundColor3 = Color3.fromRGB(5, 8, 15) 
+    Main.BackgroundColor3 = Color3.fromRGB(5, 8, 15)
     Main.Position = UDim2.new(0.5, -140, 0.5, -175)
     Main.Size = UDim2.new(0, 280, 0, 380)
     Main.Active = true
@@ -3728,7 +3726,7 @@ Misc:AddButton("💎 Legends Rock List", function()
     SearchBox.Text = ""
     SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     SearchBox.PlaceholderColor3 = Color3.fromRGB(100, 150, 200)
-    SearchBox.TextSize = 14 -- İstediğin Boyut
+    SearchBox.TextSize = 14
     Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
     local sBox = Instance.new("UIStroke", SearchBox)
     sBox.Color = Color3.fromRGB(0, 180, 255)
@@ -4889,6 +4887,7 @@ Misc:AddButton("💎 Legends Rock List", function()
         "Rebirth: 76480",
         "Rebirth: 85480",
         "Rebirth: 94980"
+        }
     }
 
     local function update(category, filterValue)
@@ -4900,14 +4899,12 @@ Misc:AddButton("💎 Legends Rock List", function()
         local inputNum = tonumber(filterValue)
 
         for _, val in pairs(data) do
-            -- "Rebirth: 50" yazısından 50'yi çekiyoruz
             local rockReb = tonumber(val:match("%d+")) 
             local show = false
 
             if not inputNum or filterValue == "" then
                 show = true
             else
-                -- Senin mantığın: Girdiğin sayının %70-%130 arası veya yakını
                 if rockReb >= inputNum * 0.7 and rockReb <= inputNum * 1.3 then
                     show = true
                 end
@@ -4920,7 +4917,7 @@ Misc:AddButton("💎 Legends Rock List", function()
                 lbl.Text = val
                 lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                 lbl.Font = Enum.Font.GothamSemibold
-                lbl.TextSize = 7 -- İstediğin Boyut
+                lbl.TextSize = 7
                 Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
                 local s = Instance.new("UIStroke", lbl)
                 s.Color = Color3.fromRGB(0, 180, 255)
@@ -4942,7 +4939,7 @@ Misc:AddButton("💎 Legends Rock List", function()
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
         b.MouseButton1Click:Connect(function() 
             currentCategory = name
-            update(name, SearchBox.Text) 
+            update(name, SearchBox.Text)
         end)
     end
 
@@ -4950,7 +4947,7 @@ Misc:AddButton("💎 Legends Rock List", function()
         update(currentCategory, SearchBox.Text)
     end)
 
-    update("Basic")
+    update("Basic", "")
 end)
 
 Misc:AddButton("👑 Muscle King Rock List", function()
@@ -4966,7 +4963,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     local Main = Instance.new("Frame")
     Main.Name = "MainFrame"
     Main.Parent = ScreenGui
-    Main.BackgroundColor3 = Color3.fromRGB(8, 0, 1) 
+    Main.BackgroundColor3 = Color3.fromRGB(8, 0, 1)
     Main.Position = UDim2.new(0.5, -140, 0.5, -175)
     Main.Size = UDim2.new(0, 280, 0, 380)
     Main.Active = true
@@ -4981,7 +4978,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     Title.Size = UDim2.new(1, 0, 0, 40)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBold
-    Title.Text = "MUSCLE KING REBİRTH GLİTCH LİST"
+    Title.Text = "MUSCLE KING REBIRTH GLITCH LIST"
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 16
 
@@ -5031,11 +5028,128 @@ Misc:AddButton("👑 Muscle King Rock List", function()
 
     local currentCategory = "Basic"
     local kingRockData = {
-        ["Basic"] = {1500, 3000, 5000, 8000, 10000},
-        ["Advanced"] = {25000, 50000, 100000},
-        ["Rare"] = {250000, 500000},
-        ["Epic"] = {1000000, 2500000},
-        ["Unique"] = {10000000, 50000000}
+    ["Basic"] = {
+        "Rebirth: 0",
+        "Rebirth: 2",
+        "Rebirth: 4",
+        "Rebirth: 6",
+        "Rebirth: 8",
+        "Rebirth: 10",
+        "Rebirth: 12",
+        "Rebirth: 14",
+        "Rebirth: 16",
+        "Rebirth: 18",
+        "Rebirth: 20",
+        "Rebirth: 22",
+        "Rebirth: 24",
+        "Rebirth: 28",
+        "Rebirth: 30",
+        "Rebirth: 32",
+        "Rebirth: 36",
+        "Rebirth: 40",
+        "Rebirth: 46",
+        "Rebirth: 48",
+        "Rebirth: 50",
+        "Rebirth: 52",
+        "Rebirth: 56",
+        "Rebirth: 58",
+        "Rebirth: 60",
+        "Rebirth: 64",
+        "Rebirth: 68",
+        "Rebirth: 70",
+        "Rebirth: 76",
+        "Rebirth: 80",
+        "Rebirth: 82",
+        "Rebirth: 84",
+        "Rebirth: 90",
+        "Rebirth: 92",
+        "Rebirth: 94",
+        "Rebirth: 100",
+        "Rebirth: 110",
+        "Rebirth: 112",
+        "Rebirth: 116",
+        "Rebirth: 120",
+        "Rebirth: 124",
+        "Rebirth: 130",
+        "Rebirth: 132",
+        "Rebirth: 136",
+        "Rebirth: 140",
+        "Rebirth: 148",
+        "Rebirth: 150",
+        "Rebirth: 160",
+        "Rebirth: 162",
+        "Rebirth: 170",
+        "Rebirth: 180",
+        "Rebirth: 184",
+        "Rebirth: 190",
+        "Rebirth: 200",
+        "Rebirth: 208",
+        "Rebirth: 220",
+        "Rebirth: 240",
+        "Rebirth: 244",
+        "Rebirth: 252",
+        "Rebirth: 260",
+        "Rebirth: 280",
+        "Rebirth: 286",
+        "Rebirth: 292",
+        "Rebirth: 310",
+        "Rebirth: 320",
+        "Rebirth: 322",
+        "Rebirth: 330",
+        "Rebirth: 340",
+        "Rebirth: 344",
+        "Rebirth: 360",
+        "Rebirth: 370",
+        "Rebirth: 380",
+        "Rebirth: 400",
+        "Rebirth: 420",
+        "Rebirth: 430",
+        "Rebirth: 460",
+        "Rebirth: 490",
+        "Rebirth: 500",
+        "Rebirth: 524",
+        "Rebirth: 530",
+        "Rebirth: 540",
+        "Rebirth: 550",
+        "Rebirth: 580",
+        "Rebirth: 592",
+        "Rebirth: 640",
+        "Rebirth: 660",
+        "Rebirth: 664",
+        "Rebirth: 680",
+        "Rebirth: 700",
+        "Rebirth: 740",
+        "Rebirth: 760",
+        "Rebirth: 780",
+        "Rebirth: 820",
+        "Rebirth: 880",
+        "Rebirth: 890",
+        "Rebirth: 930",
+        "Rebirth: 1000",
+        "Rebirth: 1030",
+        "Rebirth: 1080",
+        "Rebirth: 1120",
+        "Rebirth: 1180",
+        "Rebirth: 1300",
+        "Rebirth: 1340",
+        "Rebirth: 1380",
+        "Rebirth: 1510",
+        "Rebirth: 1540",
+        "Rebirth: 1690",
+        "Rebirth: 1800",
+        "Rebirth: 1880",
+        "Rebirth: 2080",
+        "Rebirth: 2380",
+        "Rebirth: 2700",
+        "Rebirth: 3040",
+        "Rebirth: 3400",
+        "Rebirth: 3780"
+    },
+    ["Advanced"] = {},
+    ["Rare"] = {},
+    ["Epic"] = {},
+    ["Unique"] = {}
+        }
     }
 
     local function update(category, filterValue)
@@ -5059,13 +5173,11 @@ Misc:AddButton("👑 Muscle King Rock List", function()
             displayData = data
         end
 
-        Scroll.CanvasSize = UDim2.new(0, 0, 0, #displayData * 40)
-        
         for _, val in pairs(displayData) do
             local lbl = Instance.new("TextLabel", Scroll)
             lbl.Size = UDim2.new(0, 240, 0, 35)
             lbl.BackgroundColor3 = Color3.fromRGB(25, 20, 5)
-            lbl.Text = "Strength Required: " .. tostring(val)
+            lbl.Text = "Rebirth Required: " .. tostring(val)
             lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
             lbl.Font = Enum.Font.GothamSemibold
             Instance.new("UICorner", lbl).CornerRadius = UDim.new(0, 6)
@@ -5074,6 +5186,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
             s.Thickness = 1
             s.Transparency = 0.8
         end
+        Scroll.CanvasSize = UDim2.new(0, 0, 0, #displayData * 40)
     end
 
     local categories = {"Basic", "Advanced", "Rare", "Epic", "Unique"}
@@ -5086,7 +5199,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
         b.MouseButton1Click:Connect(function() 
             currentCategory = name
-            update(name, SearchBox.Text) 
+            update(name, SearchBox.Text)
         end)
     end
 
@@ -5094,7 +5207,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
         update(currentCategory, SearchBox.Text)
     end)
 
-    update("Basic")
+    update("Basic", "")
 end)
 
 local scriptFolder = Misc:AddFolder(" 📜 External Scripts")

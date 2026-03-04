@@ -1033,81 +1033,144 @@ RockFolder:AddSwitch("🌴 Jungle Rock 10M", function(Value)
     end)
 end)
 
-local lp = game:GetService("Players").LocalPlayer
-local runService = game:GetService("RunService")
+Main:AddLabel("🔥 Auto Rock V2 (Teleport)")
 
-local rockData = {
-    ["Tiny Rock"] = {dur = 0, pos = Vector3.new(12.90, 2.22, 2096.17)},
-    ["Starter Rock"] = {dur = 100, pos = Vector3.new(179.45, 2.99, -152.29)},
-    ["Golden Rock"] = {dur = 5000, pos = Vector3.new(342.52, 3.27, -558.85)},
-    ["Frost Rock"] = {dur = 150000, pos = Vector3.new(-2590.09, 4.44, -240.25)},
-    ["Mythical Rock"] = {dur = 400000, pos = Vector3.new(2224.77, 3.97, 1249.08)},
-    ["Eternal Rock"] = {dur = 750000, pos = Vector3.new(-7223.42, 4.37, -1261.61)},
-    ["Legend Rock"] = {dur = 1000000, pos = Vector3.new(4140.66, 989.22, -4032.36)},
-    ["Muscle King Rock"] = {dur = 5000000, pos = Vector3.new(-9039.20, 7.02, -6055.77)},
-    ["Jungle Rock"] = {dur = 10000000, pos = Vector3.new(-7705.77, 4.51, 2919.14)}
+local FaceDirections = {
+    North = Vector3.new(0, 0, -1),
+    South = Vector3.new(0, 0, 1),
+    East = Vector3.new(1, 0, 0),
+    West = Vector3.new(-1, 0, 0),
 }
 
-local selectedRock = ""
-local rockActive = false
+local function LockPosition(CFramePosition)
+    _G.lockRunning = true
+    _G.LockedCFrame = CFramePosition
+    
+    if _G.lockConnection then
+        _G.lockConnection:Disconnect()
+    end
+    
+    _G.lockConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        local Character = game.Players.LocalPlayer.Character
+        if Character and _G.lockRunning then
+            local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+            local Humanoid = Character:FindFirstChild("Humanoid")
+            if HumanoidRootPart and Humanoid then
+                HumanoidRootPart.CFrame = _G.LockedCFrame
+                HumanoidRootPart.Velocity = Vector3.zero
+                HumanoidRootPart.RotVelocity = Vector3.zero
+                Humanoid.PlatformStand = true
+            end
+        end
+    end)
+end
 
-Main:AddLabel("👊 Rock Farm V10")
+local function UnlockPosition()
+    _G.lockRunning = false
+    if _G.lockConnection then
+        _G.lockConnection:Disconnect()
+    end
+    
+    local Humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+    if Humanoid then
+        Humanoid.PlatformStand = false
+    end
+end
 
-local RockDrop = Main:AddDropdown("📍 Select Rock", function(text)
-    selectedRock = text
+game.Players.LocalPlayer.CharacterAdded:Connect(function(Character)
+    task.defer(function()
+        if _G.lockRunning and _G.LockedCFrame then
+            Character:WaitForChild("HumanoidRootPart").CFrame = _G.LockedCFrame
+            LockPosition(_G.LockedCFrame)
+        end
+    end)
 end)
 
-for name, _ in pairs(rockData) do RockDrop:Add(name) end
+local RockConfigurations = {
+    {name = "Jungle Rock", key = "Glitch_Jungle", dur = 10000000, pos = Vector3.new(-7706.23, 4.51, 2918.94), face = "East"},
+    {name = "Muscle King Rock", key = "Glitch_MuscleKing", dur = 5000000, pos = Vector3.new(-9040.84, 6.9, -6057.31), face = "East"},
+    {name = "Legend Rock", key = "Glitch_Legend", dur = 1000000, pos = Vector3.new(4141.13, 989.23, -4029.81), face = "North"},
+    {name = "Eternal Rock", key = "Glitch_Eternal", dur = 750000, pos = Vector3.new(-7223.26, 5.07, -1259.91), face = "West"},
+    {name = "Mythical Rock", key = "Glitch_Mythical", dur = 400000, pos = Vector3.new(2224.73, 5.03, 1251.95), face = "West"},
+    {name = "Frost Rock", key = "Glitch_Frost", dur = 150000, pos = Vector3.new(-2590.58, 5.03, -241.71), face = "East"},
+    {name = "Golden Rock", key = "Glitch_Golden", dur = 5000, pos = Vector3.new(342.33, 5.12, -590.91), face = "West"},
+    {name = "Starter Island", key = "Glitch_Starter", dur = 100, pos = Vector3.new(182.07, 5.03, -151.99), face = "West"},
+    {name = "Tiny Rock", key = "Glitch_Tiny", dur = 0, pos = Vector3.new(18.27, 5.23, 2093.81), face = "South"}
+}
 
-Main:AddSwitch("Auto Rock Farm", function(state)
-    rockActive = state
+local selectedRockV2 = nil
+local rockV2StartActive = false
+
+local rockV2Dropdown = Main:AddDropdown("📍 Select Rock V2", function(selected)
+    selectedRockV2 = selected
+    print("Selected rock V2: " .. selected)
+end)
+
+for _, RockConfig in ipairs(RockConfigurations) do
+    rockV2Dropdown:Add(RockConfig.name)
+end
+
+Main:AddSwitch("👊 Start Rock V2 Farm", function(Value)
+    rockV2StartActive = Value
     
-    if state then
-        task.spawn(function()
-            while rockActive do
-                task.wait()
-                local data = rockData[selectedRock]
-                local char = lp.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                local punch = lp.Backpack:FindFirstChild("Punch") or (char and char:FindFirstChild("Punch"))
-                
-                if data and root and lp.Durability.Value >= data.dur then
-                    if (root.Position - data.pos).Magnitude > 8 then
-                        if getgenv().posLock then 
-                            getgenv().posLock:Disconnect() 
-                            getgenv().posLock = nil 
-                        end
-                        
-                        root.CFrame = CFrame.new(data.pos)
-                        task.wait(0.2)
-                        
-                        local targetPos = data.pos
-                        getgenv().posLock = runService.Heartbeat:Connect(function()
-                            if char:FindFirstChild("HumanoidRootPart") then
-                                local currentRot = char.HumanoidRootPart.CFrame - char.HumanoidRootPart.CFrame.Position
-                                char.HumanoidRootPart.CFrame = currentRot + targetPos
+    if Value then
+        if selectedRockV2 == nil then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please select a rock first!",
+                Duration = 3
+            })
+            return
+        end
+        
+        for _, RockConfig in ipairs(RockConfigurations) do
+            if RockConfig.name == selectedRockV2 then
+                _G[RockConfig.key] = true
+                task.spawn(function()
+                    while _G[RockConfig.key] and rockV2StartActive do
+                        local LocalPlayer = game.Players.LocalPlayer
+                        if LocalPlayer:FindFirstChild("Durability") and LocalPlayer.Durability.Value >= RockConfig.dur then
+                            local Direction = FaceDirections[RockConfig.face] or Vector3.new(0, 0, -1)
+                            local TargetCFrame = CFrame.new(RockConfig.pos, RockConfig.pos + Direction)
+                            local Character = LocalPlayer.Character
+                            
+                            if Character and Character:FindFirstChild("HumanoidRootPart") then
+                                Character.HumanoidRootPart.CFrame = TargetCFrame
+                                LockPosition(TargetCFrame)
                             end
-                        end)
-                    end
-
-                    if punch then
-                        punch.Parent = char
-                        if punch:FindFirstChild("attackTime") then
-                            punch.attackTime.Value = 0
+                            
+                            local PunchTool = LocalPlayer.Backpack:FindFirstChild("Punch") or 
+                                             (Character and Character:FindFirstChild("Punch"))
+                            
+                            if PunchTool and Character and Character:FindFirstChild("Humanoid") then
+                                if PunchTool.Parent ~= Character then
+                                    Character.Humanoid:EquipTool(PunchTool)
+                                end
+                                
+                                if PunchTool:FindFirstChild("attackTime") then
+                                    PunchTool.attackTime.Value = 0.1
+                                end
+                                
+                                LocalPlayer.muscleEvent:FireServer("punch", "leftHand")
+                                LocalPlayer.muscleEvent:FireServer("punch", "rightHand")
+                                PunchTool:Activate()
+                            end
                         end
-                        punch:Activate()
+                        task.wait()
                     end
-                end
+                    UnlockPosition()
+                    _G[RockConfig.key] = false
+                end)
+            else
+                _G[RockConfig.key] = false
             end
-        end)
+        end
     else
-        if getgenv().posLock then
-            getgenv().posLock:Disconnect()
-            getgenv().posLock = nil
+        for _, RockConfig in ipairs(RockConfigurations) do
+            _G[RockConfig.key] = false
         end
-        if lp.Character and lp.Character:FindFirstChild("Punch") then
-            lp.Character.Punch.Parent = lp.Backpack
-        end
+        UnlockPosition()
+        print("Rock V2 farm stopped")
     end
 end)
 
@@ -2260,6 +2323,8 @@ task.spawn(function()
         end
     end
 end)
+
+LookDura:AddLabel("")
 
 local SpyFolder = LookDura:AddFolder(" 📊 Spy Stats")
 local SelectPlayerName = ""
@@ -4988,7 +5053,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     UIListLayout.Padding = UDim.new(0, 4)
     UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    local legendRockData = {
+    local muscleKingRockData = {
     ["Basic"] = {
         "Rebirth: 0",
         "Rebirth: 2",
@@ -5106,10 +5171,703 @@ Misc:AddButton("👑 Muscle King Rock List", function()
         "Rebirth: 3400",
         "Rebirth: 3780"
     },
-    ["Advanced"] = {},
-    ["Rare"] = {},
-    ["Epic"] = {},
-    ["Unique"] = {}
+    ["Advanced"] = {
+        "Rebirth: 0",
+        "Rebirth: 2",
+        "Rebirth: 4",
+        "Rebirth: 6",
+        "Rebirth: 8",
+        "Rebirth: 10",
+        "Rebirth: 12",
+        "Rebirth: 14",
+        "Rebirth: 16",
+        "Rebirth: 18",
+        "Rebirth: 20",
+        "Rebirth: 22",
+        "Rebirth: 24",
+        "Rebirth: 28",
+        "Rebirth: 30",
+        "Rebirth: 32",
+        "Rebirth: 36",
+        "Rebirth: 40",
+        "Rebirth: 44",
+        "Rebirth: 46",
+        "Rebirth: 48",
+        "Rebirth: 50",
+        "Rebirth: 52",
+        "Rebirth: 56",
+        "Rebirth: 58",
+        "Rebirth: 60",
+        "Rebirth: 64",
+        "Rebirth: 68",
+        "Rebirth: 70",
+        "Rebirth: 76",
+        "Rebirth: 80",
+        "Rebirth: 82",
+        "Rebirth: 84",
+        "Rebirth: 90",
+        "Rebirth: 92",
+        "Rebirth: 94",
+        "Rebirth: 100",
+        "Rebirth: 110",
+        "Rebirth: 112",
+        "Rebirth: 116",
+        "Rebirth: 120",
+        "Rebirth: 124",
+        "Rebirth: 130",
+        "Rebirth: 132",
+        "Rebirth: 136",
+        "Rebirth: 140",
+        "Rebirth: 148",
+        "Rebirth: 150",
+        "Rebirth: 156",
+        "Rebirth: 160",
+        "Rebirth: 162",
+        "Rebirth: 170",
+        "Rebirth: 172",
+        "Rebirth: 180",
+        "Rebirth: 184",
+        "Rebirth: 188",
+        "Rebirth: 190",
+        "Rebirth: 200",
+        "Rebirth: 204",
+        "Rebirth: 208",
+        "Rebirth: 220",
+        "Rebirth: 240",
+        "Rebirth: 244",
+        "Rebirth: 252",
+        "Rebirth: 260",
+        "Rebirth: 268",
+        "Rebirth: 280",
+        "Rebirth: 284",
+        "Rebirth: 286",
+        "Rebirth: 292",
+        "Rebirth: 300",
+        "Rebirth: 310",
+        "Rebirth: 316",
+        "Rebirth: 320",
+        "Rebirth: 322",
+        "Rebirth: 330",
+        "Rebirth: 340",
+        "Rebirth: 344",
+        "Rebirth: 360",
+        "Rebirth: 370",
+        "Rebirth: 380",
+        "Rebirth: 388",
+        "Rebirth: 400",
+        "Rebirth: 420",
+        "Rebirth: 430",
+        "Rebirth: 436",
+        "Rebirth: 460",
+        "Rebirth: 490",
+        "Rebirth: 500",
+        "Rebirth: 508",
+        "Rebirth: 524",
+        "Rebirth: 530",
+        "Rebirth: 540",
+        "Rebirth: 550",
+        "Rebirth: 580",
+        "Rebirth: 592",
+        "Rebirth: 604",
+        "Rebirth: 640",
+        "Rebirth: 660",
+        "Rebirth: 664",
+        "Rebirth: 680",
+        "Rebirth: 700",
+        "Rebirth: 708",
+        "Rebirth: 740",
+        "Rebirth: 760",
+        "Rebirth: 780",
+        "Rebirth: 820",
+        "Rebirth: 860",
+        "Rebirth: 880",
+        "Rebirth: 890",
+        "Rebirth: 930",
+        "Rebirth: 940",
+        "Rebirth: 1000",
+        "Rebirth: 1020",
+        "Rebirth: 1030",
+        "Rebirth: 1068",
+        "Rebirth: 1080",
+        "Rebirth: 1100",
+        "Rebirth: 1120",
+        "Rebirth: 1180",
+        "Rebirth: 1204",
+        "Rebirth: 1300",
+        "Rebirth: 1340",
+        "Rebirth: 1348",
+        "Rebirth: 1380",
+        "Rebirth: 1420",
+        "Rebirth: 1500",
+        "Rebirth: 1510",
+        "Rebirth: 1540",
+        "Rebirth: 1580",
+        "Rebirth: 1660",
+        "Rebirth: 1690",
+        "Rebirth: 1780",
+        "Rebirth: 1800",
+        "Rebirth: 1880",
+        "Rebirth: 2020",
+        "Rebirth: 2080",
+        "Rebirth: 2180",
+        "Rebirth: 2260",
+        "Rebirth: 2380",
+        "Rebirth: 2620",
+        "Rebirth: 2700",
+        "Rebirth: 2780",
+        "Rebirth: 3040",
+        "Rebirth: 3100",
+        "Rebirth: 3400",
+        "Rebirth: 3620",
+        "Rebirth: 3780",
+        "Rebirth: 4180",
+        "Rebirth: 4780",
+        "Rebirth: 5420",
+        "Rebirth: 6100",
+        "Rebirth: 6820"
+    },
+    ["Rare"] = {
+        "Rebirth: 0",
+        "Rebirth: 2",
+        "Rebirth: 4",
+        "Rebirth: 6",
+        "Rebirth: 8",
+        "Rebirth: 10",
+        "Rebirth: 12",
+        "Rebirth: 14",
+        "Rebirth: 16",
+        "Rebirth: 18",
+        "Rebirth: 20",
+        "Rebirth: 22",
+        "Rebirth: 24",
+        "Rebirth: 28",
+        "Rebirth: 30",
+        "Rebirth: 32",
+        "Rebirth: 34",
+        "Rebirth: 36",
+        "Rebirth: 40",
+        "Rebirth: 46",
+        "Rebirth: 48",
+        "Rebirth: 50",
+        "Rebirth: 52",
+        "Rebirth: 56",
+        "Rebirth: 58",
+        "Rebirth: 60",
+        "Rebirth: 64",
+        "Rebirth: 68",
+        "Rebirth: 70",
+        "Rebirth: 76",
+        "Rebirth: 80",
+        "Rebirth: 82",
+        "Rebirth: 84",
+        "Rebirth: 88",
+        "Rebirth: 90",
+        "Rebirth: 92",
+        "Rebirth: 94",
+        "Rebirth: 100",
+        "Rebirth: 106",
+        "Rebirth: 110",
+        "Rebirth: 112",
+        "Rebirth: 116",
+        "Rebirth: 120",
+        "Rebirth: 124",
+        "Rebirth: 130",
+        "Rebirth: 132",
+        "Rebirth: 136",
+        "Rebirth: 140",
+        "Rebirth: 148",
+        "Rebirth: 150",
+        "Rebirth: 160",
+        "Rebirth: 162",
+        "Rebirth: 170",
+        "Rebirth: 178",
+        "Rebirth: 180",
+        "Rebirth: 184",
+        "Rebirth: 190",
+        "Rebirth: 196",
+        "Rebirth: 200",
+        "Rebirth: 208",
+        "Rebirth: 214",
+        "Rebirth: 220",
+        "Rebirth: 232",
+        "Rebirth: 240",
+        "Rebirth: 244",
+        "Rebirth: 250",
+        "Rebirth: 252",
+        "Rebirth: 260",
+        "Rebirth: 268",
+        "Rebirth: 280",
+        "Rebirth: 286",
+        "Rebirth: 292",
+        "Rebirth: 310",
+        "Rebirth: 316",
+        "Rebirth: 320",
+        "Rebirth: 322",
+        "Rebirth: 330",
+        "Rebirth: 340",
+        "Rebirth: 344",
+        "Rebirth: 360",
+        "Rebirth: 370",
+        "Rebirth: 376",
+        "Rebirth: 380",
+        "Rebirth: 388",
+        "Rebirth: 400",
+        "Rebirth: 412",
+        "Rebirth: 420",
+        "Rebirth: 430",
+        "Rebirth: 436",
+        "Rebirth: 448",
+        "Rebirth: 460",
+        "Rebirth: 484",
+        "Rebirth: 490",
+        "Rebirth: 500",
+        "Rebirth: 520",
+        "Rebirth: 524",
+        "Rebirth: 526",
+        "Rebirth: 530",
+        "Rebirth: 540",
+        "Rebirth: 550",
+        "Rebirth: 580",
+        "Rebirth: 592",
+        "Rebirth: 610",
+        "Rebirth: 640",
+        "Rebirth: 660",
+        "Rebirth: 664",
+        "Rebirth: 680",
+        "Rebirth: 700",
+        "Rebirth: 740",
+        "Rebirth: 760",
+        "Rebirth: 772",
+        "Rebirth: 780",
+        "Rebirth: 796",
+        "Rebirth: 820",
+        "Rebirth: 880",
+        "Rebirth: 890",
+        "Rebirth: 898",
+        "Rebirth: 916",
+        "Rebirth: 930",
+        "Rebirth: 970",
+        "Rebirth: 1000",
+        "Rebirth: 1006",
+        "Rebirth: 1030",
+        "Rebirth: 1060",
+        "Rebirth: 1072",
+        "Rebirth: 1080",
+        "Rebirth: 1120",
+        "Rebirth: 1150",
+        "Rebirth: 1180",
+        "Rebirth: 1240",
+        "Rebirth: 1300",
+        "Rebirth: 1330",
+        "Rebirth: 1340",
+        "Rebirth: 1380",
+        "Rebirth: 1420",
+        "Rebirth: 1510",
+        "Rebirth: 1540",
+        "Rebirth: 1612",
+        "Rebirth: 1630",
+        "Rebirth: 1660",
+        "Rebirth: 1690",
+        "Rebirth: 1780",
+        "Rebirth: 1800",
+        "Rebirth: 1816",
+        "Rebirth: 1880",
+        "Rebirth: 1960",
+        "Rebirth: 2020",
+        "Rebirth: 2032",
+        "Rebirth: 2080",
+        "Rebirth: 2140",
+        "Rebirth: 2260",
+        "Rebirth: 2320",
+        "Rebirth: 2380",
+        "Rebirth: 2500",
+        "Rebirth: 2680",
+        "Rebirth: 2700",
+        "Rebirth: 2710",
+        "Rebirth: 2830",
+        "Rebirth: 3040",
+        "Rebirth: 3130",
+        "Rebirth: 3280",
+        "Rebirth: 3400",
+        "Rebirth: 3580",
+        "Rebirth: 3780",
+        "Rebirth: 3940",
+        "Rebirth: 4060",
+        "Rebirth: 4180",
+        "Rebirth: 4570",
+        "Rebirth: 4660",
+        "Rebirth: 5110",
+        "Rebirth: 5440",
+        "Rebirth: 5680",
+        "Rebirth: 6280",
+        "Rebirth: 7180",
+        "Rebirth: 8140",
+        "Rebirth: 9160",
+        "Rebirth: 10240",
+        "Rebirth: 11380"
+    },
+    ["Epic"] = {
+        "Rebirth: 0",
+        "Rebirth: 2",
+        "Rebirth: 4",
+        "Rebirth: 6",
+        "Rebirth: 8",
+        "Rebirth: 10",
+        "Rebirth: 12",
+        "Rebirth: 14",
+        "Rebirth: 16",
+        "Rebirth: 18",
+        "Rebirth: 20",
+        "Rebirth: 22",
+        "Rebirth: 24",
+        "Rebirth: 28",
+        "Rebirth: 30",
+        "Rebirth: 32",
+        "Rebirth: 36",
+        "Rebirth: 40",
+        "Rebirth: 44",
+        "Rebirth: 46",
+        "Rebirth: 48",
+        "Rebirth: 50",
+        "Rebirth: 52",
+        "Rebirth: 56",
+        "Rebirth: 58",
+        "Rebirth: 60",
+        "Rebirth: 64",
+        "Rebirth: 68",
+        "Rebirth: 70",
+        "Rebirth: 76",
+        "Rebirth: 80",
+        "Rebirth: 82",
+        "Rebirth: 84",
+        "Rebirth: 90",
+        "Rebirth: 92",
+        "Rebirth: 94",
+        "Rebirth: 100",
+        "Rebirth: 108",
+        "Rebirth: 110",
+        "Rebirth: 112",
+        "Rebirth: 116",
+        "Rebirth: 120",
+        "Rebirth: 124",
+        "Rebirth: 130",
+        "Rebirth: 132",
+        "Rebirth: 136",
+        "Rebirth: 140",
+        "Rebirth: 148",
+        "Rebirth: 150",
+        "Rebirth: 156",
+        "Rebirth: 160",
+        "Rebirth: 162",
+        "Rebirth: 170",
+        "Rebirth: 172",
+        "Rebirth: 180",
+        "Rebirth: 184",
+        "Rebirth: 188",
+        "Rebirth: 190",
+        "Rebirth: 200",
+        "Rebirth: 204",
+        "Rebirth: 208",
+        "Rebirth: 220",
+        "Rebirth: 240",
+        "Rebirth: 244",
+        "Rebirth: 252",
+        "Rebirth: 260",
+        "Rebirth: 268",
+        "Rebirth: 280",
+        "Rebirth: 284",
+        "Rebirth: 286",
+        "Rebirth: 292",
+        "Rebirth: 300",
+        "Rebirth: 310",
+        "Rebirth: 316",
+        "Rebirth: 320",
+        "Rebirth: 322",
+        "Rebirth: 330",
+        "Rebirth: 332",
+        "Rebirth: 340",
+        "Rebirth: 344",
+        "Rebirth: 360",
+        "Rebirth: 364",
+        "Rebirth: 370",
+        "Rebirth: 380",
+        "Rebirth: 388",
+        "Rebirth: 396",
+        "Rebirth: 400",
+        "Rebirth: 420",
+        "Rebirth: 428",
+        "Rebirth: 430",
+        "Rebirth: 436",
+        "Rebirth: 460",
+        "Rebirth: 490",
+        "Rebirth: 500",
+        "Rebirth: 508",
+        "Rebirth: 524",
+        "Rebirth: 530",
+        "Rebirth: 540",
+        "Rebirth: 550",
+        "Rebirth: 556",
+        "Rebirth: 580",
+        "Rebirth: 588",
+        "Rebirth: 592",
+        "Rebirth: 604",
+        "Rebirth: 620",
+        "Rebirth: 640",
+        "Rebirth: 652",
+        "Rebirth: 660",
+        "Rebirth: 664",
+        "Rebirth: 680",
+        "Rebirth: 700",
+        "Rebirth: 708",
+        "Rebirth: 740",
+        "Rebirth: 760",
+        "Rebirth: 780",
+        "Rebirth: 796",
+        "Rebirth: 820",
+        "Rebirth: 860",
+        "Rebirth: 880",
+        "Rebirth: 890",
+        "Rebirth: 892",
+        "Rebirth: 930",
+        "Rebirth: 940",
+        "Rebirth: 1000",
+        "Rebirth: 1020",
+        "Rebirth: 1030",
+        "Rebirth: 1036",
+        "Rebirth: 1068",
+        "Rebirth: 1080",
+        "Rebirth: 1100",
+        "Rebirth: 1120",
+        "Rebirth: 1180",
+        "Rebirth: 1204",
+        "Rebirth: 1228",
+        "Rebirth: 1300",
+        "Rebirth: 1340",
+        "Rebirth: 1348",
+        "Rebirth: 1380",
+        "Rebirth: 1420",
+        "Rebirth: 1436",
+        "Rebirth: 1500",
+        "Rebirth: 1510",
+        "Rebirth: 1540",
+        "Rebirth: 1580",
+        "Rebirth: 1660",
+        "Rebirth: 1690",
+        "Rebirth: 1740",
+        "Rebirth: 1780",
+        "Rebirth: 1800",
+        "Rebirth: 1880",
+        "Rebirth: 1900",
+        "Rebirth: 2020",
+        "Rebirth: 2060",
+        "Rebirth: 2080",
+        "Rebirth: 2156",
+        "Rebirth: 2180",
+        "Rebirth: 2220",
+        "Rebirth: 2260",
+        "Rebirth: 2380",
+        "Rebirth: 2428",
+        "Rebirth: 2620",
+        "Rebirth: 2700",
+        "Rebirth: 2716",
+        "Rebirth: 2780",
+        "Rebirth: 2860",
+        "Rebirth: 3020",
+        "Rebirth: 3040",
+        "Rebirth: 3100",
+        "Rebirth: 3180",
+        "Rebirth: 3340",
+        "Rebirth: 3400",
+        "Rebirth: 3580",
+        "Rebirth: 3620",
+        "Rebirth: 3780",
+        "Rebirth: 4060",
+        "Rebirth: 4180",
+        "Rebirth: 4380",
+        "Rebirth: 4540",
+        "Rebirth: 4780",
+        "Rebirth: 5260",
+        "Rebirth: 5420",
+        "Rebirth: 5580",
+        "Rebirth: 6100",
+        "Rebirth: 6220",
+        "Rebirth: 6820",
+        "Rebirth: 7260",
+        "Rebirth: 7580",
+        "Rebirth: 8380",
+        "Rebirth: 9580",
+        "Rebirth: 10860",
+        "Rebirth: 12220",
+        "Rebirth: 13660",
+        "Rebirth: 15180"
+    },
+    ["Unique"] = {
+        "Rebirth: 0",
+        "Rebirth: 2",
+        "Rebirth: 4",
+        "Rebirth: 6",
+        "Rebirth: 8",
+        "Rebirth: 10",
+        "Rebirth: 12",
+        "Rebirth: 14",
+        "Rebirth: 16",
+        "Rebirth: 18",
+        "Rebirth: 20",
+        "Rebirth: 22",
+        "Rebirth: 24",
+        "Rebirth: 28",
+        "Rebirth: 30",
+        "Rebirth: 32",
+        "Rebirth: 36",
+        "Rebirth: 40",
+        "Rebirth: 46",
+        "Rebirth: 48",
+        "Rebirth: 50",
+        "Rebirth: 52",
+        "Rebirth: 56",
+        "Rebirth: 58",
+        "Rebirth: 60",
+        "Rebirth: 64",
+        "Rebirth: 68",
+        "Rebirth: 70",
+        "Rebirth: 76",
+        "Rebirth: 80",
+        "Rebirth: 82",
+        "Rebirth: 84",
+        "Rebirth: 90",
+        "Rebirth: 92",
+        "Rebirth: 94",
+        "Rebirth: 100",
+        "Rebirth: 110",
+        "Rebirth: 112",
+        "Rebirth: 116",
+        "Rebirth: 120",
+        "Rebirth: 124",
+        "Rebirth: 130",
+        "Rebirth: 132",
+        "Rebirth: 136",
+        "Rebirth: 140",
+        "Rebirth: 148",
+        "Rebirth: 150",
+        "Rebirth: 160",
+        "Rebirth: 162",
+        "Rebirth: 170",
+        "Rebirth: 180",
+        "Rebirth: 184",
+        "Rebirth: 190",
+        "Rebirth: 200",
+        "Rebirth: 208",
+        "Rebirth: 220",
+        "Rebirth: 230",
+        "Rebirth: 240",
+        "Rebirth: 244",
+        "Rebirth: 252",
+        "Rebirth: 260",
+        "Rebirth: 280",
+        "Rebirth: 286",
+        "Rebirth: 292",
+        "Rebirth: 310",
+        "Rebirth: 320",
+        "Rebirth: 322",
+        "Rebirth: 330",
+        "Rebirth: 340",
+        "Rebirth: 344",
+        "Rebirth: 360",
+        "Rebirth: 370",
+        "Rebirth: 380",
+        "Rebirth: 400",
+        "Rebirth: 420",
+        "Rebirth: 430",
+        "Rebirth: 460",
+        "Rebirth: 480",
+        "Rebirth: 490",
+        "Rebirth: 500",
+        "Rebirth: 524",
+        "Rebirth: 530",
+        "Rebirth: 540",
+        "Rebirth: 550",
+        "Rebirth: 580",
+        "Rebirth: 592",
+        "Rebirth: 630",
+        "Rebirth: 640",
+        "Rebirth: 660",
+        "Rebirth: 664",
+        "Rebirth: 680",
+        "Rebirth: 700",
+        "Rebirth: 730",
+        "Rebirth: 740",
+        "Rebirth: 760",
+        "Rebirth: 780",
+        "Rebirth: 820",
+        "Rebirth: 830",
+        "Rebirth: 880",
+        "Rebirth: 890",
+        "Rebirth: 930",
+        "Rebirth: 980",
+        "Rebirth: 1000",
+        "Rebirth: 1030",
+        "Rebirth: 1080",
+        "Rebirth: 1120",
+        "Rebirth: 1180",
+        "Rebirth: 1280",
+        "Rebirth: 1300",
+        "Rebirth: 1340",
+        "Rebirth: 1380",
+        "Rebirth: 1480",
+        "Rebirth: 1510",
+        "Rebirth: 1540",
+        "Rebirth: 1630",
+        "Rebirth: 1680",
+        "Rebirth: 1690",
+        "Rebirth: 1730",
+        "Rebirth: 1780",
+        "Rebirth: 1800",
+        "Rebirth: 1880",
+        "Rebirth: 1930",
+        "Rebirth: 1980",
+        "Rebirth: 2080",
+        "Rebirth: 2180",
+        "Rebirth: 2230",
+        "Rebirth: 2380",
+        "Rebirth: 2530",
+        "Rebirth: 2580",
+        "Rebirth: 2700",
+        "Rebirth: 2730",
+        "Rebirth: 2780",
+        "Rebirth: 2830",
+        "Rebirth: 2980",
+        "Rebirth: 3040",
+        "Rebirth: 3280",
+        "Rebirth: 3380",
+        "Rebirth: 3400",
+        "Rebirth: 3480",
+        "Rebirth: 3580",
+        "Rebirth: 3780",
+        "Rebirth: 3880",
+        "Rebirth: 3980",
+        "Rebirth: 4180",
+        "Rebirth: 4480",
+        "Rebirth: 4530",
+        "Rebirth: 4730",
+        "Rebirth: 5080",
+        "Rebirth: 5230",
+        "Rebirth: 5480",
+        "Rebirth: 5680",
+        "Rebirth: 5980",
+        "Rebirth: 6580",
+        "Rebirth: 6780",
+        "Rebirth: 6980",
+        "Rebirth: 7630",
+        "Rebirth: 7780",
+        "Rebirth: 8530",
+        "Rebirth: 9080",
+        "Rebirth: 9480",
+        "Rebirth: 10480",
+        "Rebirth: 11980",
+        "Rebirth: 13580",
+        "Rebirth: 15280",
+        "Rebirth: 17080",
+        "Rebirth: 18980"
     }
 
     local function updateList(category)
@@ -5117,7 +5875,7 @@ Misc:AddButton("👑 Muscle King Rock List", function()
             if child:IsA("TextLabel") then child:Destroy() end
         end
         
-        local data = legendRockData[category] or {}
+        local data = muscleKingRockData[category] or {}
         ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #data * 36)
         
         for _, text in pairs(data) do

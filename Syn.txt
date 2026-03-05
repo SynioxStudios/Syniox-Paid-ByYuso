@@ -1,3 +1,7 @@
+loadstring = loadstring or function(code)
+    return load(code)
+end
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local VirtualInputManager = game:GetService("VirtualInputManager")

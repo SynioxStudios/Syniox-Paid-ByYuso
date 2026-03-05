@@ -3220,29 +3220,6 @@ Misc:AddSwitch("🌊 Full Walk on Water", function(bool)
     end
 end)
 
-Misc:AddSwitch("👻 Noclip", function(state)
-    _G.noclip = state
-    local player = game:GetService("Players").LocalPlayer
-    local runService = game:GetService("RunService")
-    
-    if _G.noclip then
-        _G.noclipConnection = runService.Stepped:Connect(function()
-            if _G.noclip and player.Character then
-                for _, part in pairs(player.Character:GetDescendants()) do
-                    if part:IsA("BasePart") and part.CanCollide then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        end)
-    else
-        if _G.noclipConnection then
-            _G.noclipConnection:Disconnect()
-            _G.noclipConnection = nil
-        end
-    end
-end)
-
 Misc:AddSwitch("🧱 Anti Knockback", function(Value)
     if Value then
         local playerName = game.Players.LocalPlayer.Name

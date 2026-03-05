@@ -1361,6 +1361,76 @@ Main:AddSwitch("🔄 Auto Buy Selected", function(state)
 end)
 
 Main:AddLabel("----------------------------")
+Main:AddLabel("--- 🏋️‍♂️ GYM ---")
+
+local VIM = game:GetService("VirtualInputManager")
+local function pressEKey()
+    VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(0.05)
+    VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+local function createFarm(folder, toggleName, cframeValue, eventName)
+    local active = false
+    folder:AddSwitch(toggleName, function(bool)
+        active = bool
+        if bool then
+            task.spawn(function()
+                while active do
+                    local char = game.Players.LocalPlayer.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        if (root.Position - cframeValue.p).Magnitude > 5 then
+                            root.CFrame = cframeValue
+                            task.wait(0.3)
+                            pressEKey()
+                        end
+                        local event = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent")
+                        if event then
+                            event:FireServer(eventName)
+                        end
+                    end
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end)
+end
+
+-- 1. JUNGLE GYM
+local JungleFolder = Main:AddFolder(" 🌴 Jungle Gym")
+createFarm(JungleFolder, "🏋️ Auto Jungle Lift", CFrame.new(-8652.85, 45.22, 2088.99), "rep")
+createFarm(JungleFolder, "💪 Auto Bench Press", CFrame.new(-8173.23, 83.82, 1907.40), "rep")
+createFarm(JungleFolder, "🦵 Auto Squat", CFrame.new(-8377.55, 48.71, 2864.90), "rep")
+createFarm(JungleFolder, "Auto Boulder", CFrame.new(-8614.81, 51.90, 2677.37), "rep")
+
+-- 2. MUSCLE KING
+local MuscleKingFolder = Main:AddFolder(" 👑 Muscle King")
+createFarm(MuscleKingFolder, "🏋️ Auto Lift", CFrame.new(-8774.03, 52.15, -5664.10), "rep")
+createFarm(MuscleKingFolder, "💪 Auto Bench Press", CFrame.new(-8589.43, 58.00, -6044.57), "rep")
+createFarm(MuscleKingFolder, "🦵 Auto Squat", CFrame.new(-8759.62, 46.50, -6041.16), "rep")
+createFarm(MuscleKingFolder, "🗿 Auto Boulder", CFrame.new(-8942.97, 60.71, -5692.74), "rep")
+
+-- 3. LEGENDS GYM
+local LegendsFolder = Main:AddFolder(" 🌟 Legends Gym")
+createFarm(LegendsFolder, "🏋️ Auto Lift", CFrame.new(4532.02, 1025.80, -4002.15), "rep")
+createFarm(LegendsFolder, "💪 Auto Bench Press", CFrame.new(4109.20, 1035.67, -3802.88), "rep")
+createFarm(LegendsFolder, "🦵 Auto Squat", CFrame.new(4438.74, 1021.38, -4058.46), "rep")
+createFarm(LegendsFolder, "🗿 Auto Boulder", CFrame.new(4188.75, 1019.85, -3905.19), "rep")
+
+-- 4. MYTHICAL GYM
+local MythicalFolder = Main:AddFolder(" 🔮 Mythical Gym")
+createFarm(MythicalFolder, "🏋️ Auto Lift", CFrame.new(2486.75, 31.91, 847.89), "rep")
+createFarm(MythicalFolder, "💪 Auto Bench Press", CFrame.new(2370.74, 57.09, 1243.37), "rep")
+createFarm(MythicalFolder, "🗿 Auto Boulder", CFrame.new(2667.31, 58.88, 1202.46), "rep")
+
+-- 5. FROST GYM
+local FrostFolder = Main:AddFolder(" ❄️ Frost Gym")
+createFarm(FrostFolder, "🏋️ Auto Lift", CFrame.new(-2917.62, 42.60, -211.29), "rep")
+createFarm(FrostFolder, "💪 Auto Bench Press", CFrame.new(-3022.97, 41.31, -197.51), "rep")
+createFarm(FrostFolder, "🦵 Auto Squat", CFrame.new(-2720.66, 27.85, -590.72), "rep")
+
+Main:AddLabel("----------------------------")
 Main:AddLabel("👊 Auto Brawl")
 
 Main:AddSwitch("🏆 Auto Join Brawl", function(state)
@@ -2184,14 +2254,14 @@ local function createMovementUI(moveName, gymLocations)
                             event:FireServer("rep")
                         end
                     end
-                    task.wait(0.05)
+                    task.wait(0.01)
                 end
             end)
         end
     end)
 end
 
-createMovementUI("Dumbbell Lift", {
+createMovementUI("Lift", {
     ["Jungle Gym"] = CFrame.new(-8652.85, 45.22, 2088.99),
     ["Muscle King"] = CFrame.new(-8774.03, 52.15, -5664.10),
     ["Legends Gym"] = CFrame.new(4532.02, 1025.80, -4002.15),
@@ -3150,6 +3220,29 @@ Misc:AddSwitch("🌊 Full Walk on Water", function(bool)
     end
 end)
 
+Misc:AddSwitch("👻 Noclip", function(state)
+    _G.noclip = state
+    local player = game:GetService("Players").LocalPlayer
+    local runService = game:GetService("RunService")
+    
+    if _G.noclip then
+        _G.noclipConnection = runService.Stepped:Connect(function()
+            if _G.noclip and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.CanCollide then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if _G.noclipConnection then
+            _G.noclipConnection:Disconnect()
+            _G.noclipConnection = nil
+        end
+    end
+end)
+
 Misc:AddSwitch("🧱 Anti Knockback", function(Value)
     if Value then
         local playerName = game.Players.LocalPlayer.Name
@@ -3209,6 +3302,10 @@ task.spawn(function()
     end
 end)
 
+Misc:AddSwitch("🍴 Auto Eat All (No Egg)", function(state)
+    autoEatBoostsEnabled = state
+end)
+
 Misc:AddButton("🗑️ Anti-Lag", function()
     local workspace = game:GetService("Workspace")
     
@@ -3239,10 +3336,6 @@ Misc:AddButton("🗑️ Anti-Lag", function()
         Text = "Map Cleared & Lag Reduced!",
         Duration = 3
     })
-end)
-
-Misc:AddSwitch("🍴 Auto Eat All (No Egg)", function(state)
-    autoEatBoostsEnabled = state
 end)
 
 Misc:AddSwitch("⬆️ Infinite Jump", function(state)
@@ -3297,6 +3390,9 @@ end)
 timeDropdown:Add("Night")
 timeDropdown:Add("Day")
 timeDropdown:Add("Midnight")
+
+Misc:AddLabel("----------------------------")
+Misc:AddLabel("🔄 Glitch Rebirth List")
 
 Misc:AddButton("🔥 Inferno Rock List", function()
     if game:GetService("CoreGui"):FindFirstChild("InfernoListUI") then 
@@ -5920,6 +6016,8 @@ Misc:AddButton("👑 Muscle King Rock List", function()
     end)
 end)
 
+Misc:AddLabel("----------------------------")
+
 local scriptFolder = Misc:AddFolder(" 📜 External Scripts")
 
 scriptFolder:AddButton("⚡ Infinite Yield", function()
@@ -6038,11 +6136,11 @@ Misc:AddButton("🚀 Server Hop", function()
 
     YesButton.Name = "YesButton"
     YesButton.Parent = Frame
-    YesButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    YesButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
     YesButton.Position = UDim2.new(0, 25, 0, 90)
     YesButton.Size = UDim2.new(0, 85, 0, 35)
     YesButton.Font = Enum.Font.GothamBold
-    YesButton.Text = "EVET"
+    YesButton.Text = "YES"
     YesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     YesButton.TextSize = 14
     
@@ -6055,7 +6153,7 @@ Misc:AddButton("🚀 Server Hop", function()
     NoButton.Position = UDim2.new(0, 140, 0, 90)
     NoButton.Size = UDim2.new(0, 85, 0, 35)
     NoButton.Font = Enum.Font.GothamBold
-    NoButton.Text = "HAYIR"
+    NoButton.Text = "NO"
     NoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     NoButton.TextSize = 14
     
@@ -6138,7 +6236,7 @@ Misc:AddSwitch("Change Size", function(state)
     end)
 end)
 
-local teleport = window:AddTab("Teleport")
+local teleport = window:AddTab("Extra")
 
 teleport:AddButton("📍Spawn", function()
     local player = game.Players.LocalPlayer
@@ -6295,3 +6393,105 @@ teleport:AddButton("📍Brawl Regular", function()
         Duration = 0
     })
 end)
+
+teleport:AddLabel("----------------------------")
+
+teleport:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(1800)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (60 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(3600)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (120 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(7200)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (150 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(9000)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (180 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(10800)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(12000)
+            end
+        end)
+    end
+end)
+
+local credits = window:AddTab("Credits")
+
+credits:AddLabel("🔥 TY FOR USİNG SYNİOX PAİD")

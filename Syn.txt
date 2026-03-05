@@ -6468,7 +6468,3 @@ teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
         end)
     end
 end)
-
-local credits = window:AddTab("Credits")
-
-credits:AddLabel("🔥 TY FOR USİNG SYNİOX PAİD")

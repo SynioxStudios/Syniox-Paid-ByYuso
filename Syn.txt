@@ -6144,6 +6144,8 @@ end)
 
 local teleport = window:AddTab("Extra")
 
+local autoEatEnabled = false
+
 teleport:AddButton("📍Spawn", function()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -6298,4 +6300,102 @@ teleport:AddButton("📍Brawl Regular", function()
         Text = "Teleported to Brawl Regular",
         Duration = 0
     })
+end)
+
+teleport:AddLabel("----------------------------")
+
+teleport:AddSwitch("🥚 Auto Eat Egg (30 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(1800)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (60 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(3600)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (120 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(7200)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (150 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(9000)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (180 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(10800)
+            end
+        end)
+    end
+end)
+
+teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
+    autoEatEnabled = state
+    if state then
+        task.spawn(function()
+            while autoEatEnabled do
+                local egg = player.Backpack:FindFirstChild("Protein Egg")
+                if egg then
+                    egg.Parent = player.Character
+                    pcall(function() egg:Activate() end)
+                end
+                task.wait(12000)
+            end
+        end)
+    end
 end)

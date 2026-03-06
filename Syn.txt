@@ -6468,3 +6468,31 @@ teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
 end)
 
 local credits = window:AddTab("Credits")
+
+local thanks = credits:AddLabel("TY FOR USİNG SYNIOX PAID SCRIPT ♥️")
+thanks.TextColor3 = Color3.fromRGB(255, 45, 0)
+
+local maker = credits:AddLabel("Made By YSF 👀")
+maker.TextColor3 = Color3.fromRGB(0, 191, 255)
+
+local helpers = credits:AddLabel("TY FOR HELP HALIS / HENNE 🔥")
+helpers.TextColor3 = Color3.fromRGB(255, 165, 0)
+
+credits:AddLabel("----------------------------")
+
+credits:AddLabel("The best script for farming is Synıox Paıd 💪")
+
+credits:AddLabel("----------------------------")
+
+local contact = credits:AddLabel("If you want to contact me 👇")
+contact.TextColor3 = Color3.fromRGB(200, 200, 200)
+
+local discord = credits:AddLabel("📝 DC: syniox_studios")
+discord.TextColor3 = Color3.fromRGB(114, 137, 218)
+
+local roblox = credits:AddLabel("🎮 Roblox: yusufemirredyus")
+roblox.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+credits:AddButton("Discord Link", function()
+    setclipboard("discord.gg/DbAU5Z6HPd")
+end)

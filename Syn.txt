@@ -6467,7 +6467,7 @@ teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
     end
 end)
 
-_G credits = window:AddTab("Credits")
+local credits = window:AddTab("Credits")
 
 _G.thanks = credits:AddLabel("TY FOR USİNG SYNIOX PAID SCRIPT ♥️")
 _G.thanks.TextColor3 = Color3.fromRGB(255, 45, 0)

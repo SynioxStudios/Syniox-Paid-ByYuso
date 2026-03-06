@@ -6466,3 +6466,36 @@ teleport:AddSwitch("🥚 Auto Eat Egg (200 Min)", function(state)
         end)
     end
 end)
+
+_G credits = window:AddTab("Credits")
+
+_G.thanks = credits:AddLabel("TY FOR USİNG SYNIOX PAID SCRIPT ♥️")
+_G.thanks.TextColor3 = Color3.fromRGB(255, 45, 0)
+
+_G.maker = credits:AddLabel("Made By YSF 👀")
+_G.maker.TextColor3 = Color3.fromRGB(0, 191, 255)
+
+_G.helpers = credits:AddLabel("TY FOR HELP HALIS / HENNE 🔥")
+_G.helpers.TextColor3 = Color3.fromRGB(255, 165, 0)
+
+_G.line1 = credits:AddLabel("----------------------------")
+_G.line1.TextColor3 = Color3.fromRGB(100, 100, 100)
+
+_G.bestScript = credits:AddLabel("The best script for farming is Synıox Paıd 💪")
+_G.bestScript.TextColor3 = Color3.fromRGB(255, 215, 0)
+
+_G.line2 = credits:AddLabel("----------------------------")
+_G.line2.TextColor3 = Color3.fromRGB(100, 100, 100)
+
+_G.contact = credits:AddLabel("If you want to contact me 👇")
+_G.contact.TextColor3 = Color3.fromRGB(200, 200, 200)
+
+_G.discord = credits:AddLabel("📝 DC: syniox_studios")
+_G.discord.TextColor3 = Color3.fromRGB(114, 137, 218)
+
+_G.roblox = credits:AddLabel("🎮 Roblox: yusufemirredyus")
+_G.roblox.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+credits:AddButton("Discord Link", function()
+    setclipboard("discord.gg/DbAU5Z6HPd")
+end)

@@ -6478,14 +6478,8 @@ maker.TextColor3 = Color3.fromRGB(0, 191, 255)
 local helpers = credits:AddLabel("TY FOR HELP HALIS / HENNE 🔥")
 helpers.TextColor3 = Color3.fromRGB(255, 165, 0)
 
-local line1 = credits:AddLabel("----------------------------")
-line1.TextColor3 = Color3.fromRGB(100, 100, 100)
-
 local bestScript = credits:AddLabel("The best script for farming is Synıox Paıd 💪")
 bestScript.TextColor3 = Color3.fromRGB(255, 215, 0)
-
-local line2 = credits:AddLabel("----------------------------")
-line2.TextColor3 = Color3.fromRGB(100, 100, 100)
 
 local contact = credits:AddLabel("If you want to contact me 👇")
 contact.TextColor3 = Color3.fromRGB(200, 200, 200)
